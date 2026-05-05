@@ -2,13 +2,14 @@ name: Deploy
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy application
-        run: |
-          # Deployment logic goes here.
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Deploy
+        run: npm run deploy

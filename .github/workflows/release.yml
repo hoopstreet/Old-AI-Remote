@@ -1,2 +1,15 @@
-# Release workflow
-This handles the release of versions.
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Create release
+        run: npm run create-release

@@ -1,14 +1,15 @@
-name: HF Sync
+name: Hugging Face Sync
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*'
 
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
       - name: Sync to Hugging Face
-        run: |
-          # Logic to sync to Hugging Face repo.
+        run: huggingface-cli repo create mymodel && huggingface-cli repo upload mymodel --path ./model

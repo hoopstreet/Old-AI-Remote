@@ -1,2 +1,9 @@
-# CHANGELOG
-- History of changes made.
+# Changelog
+
+## [Unreleased]
+
+### Added
+- Initial project setup
+
+### Changed
+- Updated dependencies

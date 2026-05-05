@@ -1,5 +1,6 @@
+# Task
+
 Priority: HIGH
 Type: feature
 
-# Task
-- Description of the task to be executed.
+Describe the tasks to be executed through this document.

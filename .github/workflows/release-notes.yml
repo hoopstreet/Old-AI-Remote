@@ -2,13 +2,14 @@ name: Release Notes
 
 on:
   push:
-    paths:
-      - docs/CHANGELOG.md
+    branches:
+      - main
 
 jobs:
-  release-notes:
+  generate_release_notes:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
       - name: Generate release notes
-        run: |
-          # Logic for generating release notes from Task.md and CHANGELOG.md goes here.
+        run: npm run release-notes

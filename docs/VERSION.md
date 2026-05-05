@@ -1,3 +1,5 @@
+# Version
+
 VERSION: 1.4.2
 STATUS: stable
 LAST_UPDATED: 2026-05-04

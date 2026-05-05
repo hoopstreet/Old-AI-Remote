@@ -11,7 +11,5 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Create Git Tag
-        run: |
-          git tag v${{ steps.version.outputs.version }}
-          git push origin v${{ steps.version.outputs.version }}
+      - name: Create tag
+        run: git tag v$(node -p "require('./package.json').version") && git push --tags

@@ -1,2 +1,15 @@
-# Preview workflow
-This file contains configurations for previewing the build.
+name: Preview
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run preview
+        run: npm run serve
