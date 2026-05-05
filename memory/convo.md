@@ -1,4 +1,4 @@
-# Follow This Conversation to build
+# Analyze this conversation to follow to build a Telegram AI-Remote
 
 You’re very close to a complete autonomous dev system, but a few critical pieces were still missing:
 
