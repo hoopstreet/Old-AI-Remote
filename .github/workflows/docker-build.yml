@@ -1,0 +1,3 @@
+# Docker Build workflow
+- Build Docker image
+- Tag with version

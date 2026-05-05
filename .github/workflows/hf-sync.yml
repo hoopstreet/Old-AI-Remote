@@ -1,0 +1,4 @@
+# Hugging Face Sync workflow
+- Sync to Hugging Face repo
+- Uses:
+hf.Dockerfile

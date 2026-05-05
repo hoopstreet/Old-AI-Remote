@@ -1,3 +1,120 @@
 {
-  "files": []
+  "files": [
+    {
+      "path": "docs/Task.md",
+      "content": "Priority: HIGH\nType: feature | fix | refactor\n\n# Task description\nThis is where you'll describe the task to be implemented."
+    },
+    {
+      "path": "docs/DNA.md",
+      "content": "# DNA Document\nThis document will contain the final merged system, detailing the overall architecture and key integrations."
+    },
+    {
+      "path": "docs/Roadmap.md",
+      "content": "# Roadmap\nThis document outlines the planned features, enhancements, and timeline for delivery."
+    },
+    {
+      "path": "docs/CHANGELOG.md",
+      "content": "# Changelog\nAll notable changes to this project will be documented here."
+    },
+    {
+      "path": "docs/README.md",
+      "content": "# Project Title\nA brief description of what this project is about."
+    },
+    {
+      "path": "docs/KNOWLEDGE_BASE.md",
+      "content": "# Knowledge Base\nThis serves as the AI's memory, containing essential learnings and insights about the project."
+    },
+    {
+      "path": "docs/SOURCE_MAP.md",
+      "content": "# SOURCE MAP\n## auth/login.js\n- Source: original repo\n- Modified: YES\n- Changes: JWT → Token system v2"
+    },
+    {
+      "path": "docs/VERSION.md",
+      "content": "VERSION: 1.4.2\nSTATUS: stable\nLAST_UPDATED: 2026-05-04"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "content": "# CI workflow\nThis file contains the CI pipeline configurations."
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "content": "# Build workflow\nThis file contains the configurations for building the application."
+    },
+    {
+      "path": ".github/workflows/test.yml",
+      "content": "# Test workflow\nThis file contains the details for testing the application."
+    },
+    {
+      "path": ".github/workflows/preview.yml",
+      "content": "# Preview workflow\nThis file contains configurations for previewing the build."
+    },
+    {
+      "path": ".github/workflows/versioning.yml",
+      "content": "# Versioning workflow\n- Reads VERSION.md\n- Auto-increment (patch/minor/major)"
+    },
+    {
+      "path": ".github/workflows/tagging.yml",
+      "content": "# Tagging workflow\n- Creates Git tags:\nv1.4.2"
+    },
+    {
+      "path": ".github/workflows/release-notes.yml",
+      "content": "# Release Notes workflow\n- Generates release notes from:\n   * Task.md\n   * CHANGELOG.md"
+    },
+    {
+      "path": ".github/workflows/deploy.yml",
+      "content": "# Deploy workflow\nThis file manages the deployment process."
+    },
+    {
+      "path": ".github/workflows/release.yml",
+      "content": "# Release workflow\nThis handles the release of versions."
+    },
+    {
+      "path": ".github/workflows/task-runner.yml",
+      "content": "# Task Runner workflow\nThis file initiates tasks based on Task.md."
+    },
+    {
+      "path": ".github/workflows/ai-agent.yml",
+      "content": "# AI Agent workflow\nThis file manages the AI processes for the project."
+    },
+    {
+      "path": ".github/workflows/merger.yml",
+      "content": "# Merger workflow\nHandles merging changes into the main branch."
+    },
+    {
+      "path": ".github/workflows/dna-sync.yml",
+      "content": "# DNA Sync workflow\nThis file synchronizes the DNA document with system changes."
+    },
+    {
+      "path": ".github/workflows/validator.yml",
+      "content": "# Validator workflow\nValidates the changes before merging."
+    },
+    {
+      "path": ".github/workflows/docker-build.yml",
+      "content": "# Docker Build workflow\n- Build Docker image\n- Tag with version"
+    },
+    {
+      "path": ".github/workflows/docker-push.yml",
+      "content": "# Docker Push workflow\n- Push the Docker image to DockerHub"
+    },
+    {
+      "path": ".github/workflows/hf-sync.yml",
+      "content": "# Hugging Face Sync workflow\n- Sync to Hugging Face repo\n- Uses:\nhf.Dockerfile"
+    },
+    {
+      "path": "task-runner.sh",
+      "content": "#!/bin/bash\n\n# Task Runner Script\nif [[ -f docs/Task.md ]]; then\n    echo \"Executing tasks from Task.md\"\n    # Custom execution logic here\nelse\n    echo \"No tasks found.\"\nfi\n"
+    },
+    {
+      "path": "Dockerfile",
+      "content": "FROM node:16\nWORKDIR /app\nCOPY . .\nRUN npm install\nCMD [\"npm\", \"start\"]"
+    },
+    {
+      "path": "hf.Dockerfile",
+      "content": "FROM hf.Dockerfile\n# Additional configurations for Hugging Face integration"
+    },
+    {
+      "path": ".env.example",
+      "content": "DATABASE_URL=your_database_url\nAPI_KEY=your_api_key"
+    }
+  ]
 }

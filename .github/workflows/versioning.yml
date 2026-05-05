@@ -1,0 +1,3 @@
+# Versioning workflow
+- Reads VERSION.md
+- Auto-increment (patch/minor/major)

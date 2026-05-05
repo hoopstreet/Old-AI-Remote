@@ -1,0 +1,4 @@
+# Release Notes workflow
+- Generates release notes from:
+   * Task.md
+   * CHANGELOG.md
