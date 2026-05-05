@@ -1,3 +1,2 @@
 # Roadmap
-
-A roadmap outlining the future directions and objectives of the project.
+This document outlines the future plans and milestones for the project.

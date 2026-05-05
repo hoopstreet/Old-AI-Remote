@@ -1,3 +1,2 @@
-# Knowledge Base
-
-This document acts as an AI memory repository containing all knowledge gained during project execution.
+# KNOWLEDGE BASE
+This document contains the AI memory and learnings from this project.

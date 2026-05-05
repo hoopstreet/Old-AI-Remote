@@ -1,3 +1,4 @@
+# Tagging Workflow
 name: Tagging
 
 on:
@@ -6,10 +7,12 @@ on:
       - main
 
 jobs:
-  tagging:
+  tag:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Create tag
-        run: git tag v$(node -p "require('./package.json').version") && git push --tags
+      - name: Create Tag
+        run: |
+          git tag v$(cat docs/VERSION.md | grep 'VERSION:' | cut -d ' ' -f2)
+          git push origin --tags

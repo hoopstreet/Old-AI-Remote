@@ -1,3 +1,2 @@
 # DNA
-
-This document serves as the final merged system report indicating the integration of various components of the project.
+This document describes the final merged system, capturing all essential components and workflows.

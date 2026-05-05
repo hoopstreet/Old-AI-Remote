@@ -1,14 +1,18 @@
+# Merger Workflow
 name: Merger
 
 on:
-  push:
-    paths:
-      - docs/DNA.md
+  workflow_run:
+    workflows: ["Task Runner"]
+    types:
+      - completed
 
 jobs:
   merge:
     runs-on: ubuntu-latest
     steps:
-      - name: Merge changes
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Merge Changes
         run: |
-          # Logic to merge changes into DNA.md.
+          # Your logic to merge changes

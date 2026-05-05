@@ -1,9 +1,2 @@
-# Changelog
-
-## [Unreleased]
-
-### Added
-- Initial project setup
-
-### Changed
-- Updated dependencies
+# CHANGELOG
+All notable changes to this project will be documented here.

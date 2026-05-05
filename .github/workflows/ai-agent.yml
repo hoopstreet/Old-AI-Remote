@@ -1,2 +1,18 @@
-# AI Agent workflow
-This file manages the AI processes for the project.
+# AI Agent Workflow
+name: AI Agent
+
+on:
+  workflow_run:
+    workflows: ["Merger"]
+    types:
+      - completed
+
+jobs:
+  think:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run AI Processing
+        run: |
+          # Your logic for AI processing

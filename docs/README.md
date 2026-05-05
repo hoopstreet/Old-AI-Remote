@@ -1,5 +1,2 @@
-# Project Title
-
-## Description
-
-This is a sample project demonstrating autonomous DevOps CI/CD pipelines.
+# README
+This is a project aimed at creating a fully autonomous DevOps system.

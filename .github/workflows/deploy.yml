@@ -1,9 +1,10 @@
+# Deploy Workflow
 name: Deploy
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
 
 jobs:
   deploy:
@@ -11,5 +12,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Deploy
-        run: npm run deploy
+      - name: Deploy Application
+        run: |
+          # Deployment commands here

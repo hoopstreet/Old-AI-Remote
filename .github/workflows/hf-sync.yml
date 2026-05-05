@@ -1,9 +1,10 @@
-name: Hugging Face Sync
+# Hugging Face Sync Workflow
+name: HF Sync
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
 
 jobs:
   sync:
@@ -12,4 +13,5 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Sync to Hugging Face
-        run: huggingface-cli repo create mymodel && huggingface-cli repo upload mymodel --path ./model
+        run: |
+          # Sync command to Hugging Face

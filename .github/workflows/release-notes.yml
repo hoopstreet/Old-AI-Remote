@@ -1,15 +1,17 @@
+# Release Notes Workflow
 name: Release Notes
 
 on:
   push:
-    branches:
-      - main
+    paths:
+      - docs/CHANGELOG.md
 
 jobs:
-  generate_release_notes:
+  generate:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Generate release notes
-        run: npm run release-notes
+      - name: Generate Release Notes
+        run: |
+          # Your logic to generate release notes from Task.md and CHANGELOG.md

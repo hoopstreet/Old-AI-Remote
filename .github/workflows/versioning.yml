@@ -1,15 +1,21 @@
+# Versioning Workflow
 name: Versioning
 
 on:
   push:
-    branches:
-      - main
+    paths:
+      - docs/VERSION.md
 
 jobs:
-  versioning:
+  bump:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Increment version
-        run: npm version patch
+      - name: Read VERSION.md
+        id: version
+        run: |
+          VERSION=$(cat docs/VERSION.md | grep 'VERSION:' | cut -d ' ' -f2)
+          echo "::set-output name=version::$VERSION"
+          echo "Bumping version to $VERSION"
+      # Add steps to auto-increment version based on your logic
