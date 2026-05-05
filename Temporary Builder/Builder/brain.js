@@ -9,33 +9,37 @@ const CONVOS = [
 ];
 
 function readConvos() {
-  return CONVOS.map(f => fs.existsSync(f) ? fs.readFileSync(f, "utf-8") : "")
-    .join("\n\n--- NEXT ---\n\n");
+  return CONVOS.map(f =>
+    fs.existsSync(f) ? fs.readFileSync(f, "utf-8") : ""
+  ).join("\n\n--- NEXT ---\n\n");
 }
 
 async function runAI() {
   const convo = readConvos();
 
   const prompt = `
-You are a SOFTWARE ENGINE BUILDER.
+You are an autonomous software builder.
 
-INPUT:
-- convo.md = GitHub Actions system
-- convo2.md = Telegram AI system
-
-TASK:
-- Merge both systems
-- Generate FULL working project
-- Output ONLY JSON
+RULES:
+- Output ONLY valid JSON
+- NO markdown, NO code blocks
+- MUST be parseable JSON
 
 FORMAT:
 {
-  "files": [{ "path": "", "content": "" }],
+  "files": [{"path":"", "content":""}],
   "install": []
 }
 
-CONVERSATION:
-${convo.slice(0,12000)}
+INPUT SYSTEMS:
+- convo.md = GitHub Actions system
+- convo2.md = Telegram system
+
+TASK:
+Merge both into working system.
+
+DATA:
+${convo.slice(0, 12000)}
 `;
 
   const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -46,6 +50,7 @@ ${convo.slice(0,12000)}
     },
     body: JSON.stringify({
       model: "openai/gpt-4o-mini",
+      temperature: 0.2,
       messages: [{ role: "user", content: prompt }]
     })
   });
@@ -58,6 +63,7 @@ ${convo.slice(0,12000)}
   }
 
   let text = data.choices[0].message.content;
+
   text = clean(text);
 
   fs.writeFileSync("Temporary Builder/docs/raw.txt", text);

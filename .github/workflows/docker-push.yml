@@ -1,14 +1,10 @@
 name: Docker Push
-
-on:
-  workflow_run:
-    workflows: ["Docker Build"]
-    types: [completed]
-
+on: [push]
 jobs:
   push:
     runs-on: ubuntu-latest
     steps:
-      - name: Push Docker image
-        run: |
-          echo "Pushing Docker image to DockerHub"
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Push to DockerHub
+        run: echo 'Pushing to DockerHub...'

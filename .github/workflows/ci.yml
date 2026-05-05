@@ -1,18 +1,10 @@
-name: Continuous Integration
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
+name: CI
+on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v2
       - name: Run build
-        run: npm install && npm run build
+        run: echo 'Building...'

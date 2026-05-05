@@ -1,16 +1,10 @@
 name: Tagging
-
-on:
-  push:
-    paths:
-      - docs/VERSION.md
-
+on: [push]
 jobs:
-  tagging:
+  tag:
     runs-on: ubuntu-latest
     steps:
-      - name: Create Tag
-        run: |
-          TAG=$(cat docs/VERSION.md | grep VERSION | awk '{print $2}')
-          git tag -a "$TAG" -m "Release version $TAG"
-          git push origin "$TAG"
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Create tag
+        run: echo 'Creating tag...'

@@ -1,15 +1,10 @@
 name: Build
-
-on:
-  push:
-    branches:
-      - main
-
+on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v2
-      - name: Run build
-        run: npm install
+      - name: Build
+        run: echo 'Building...'

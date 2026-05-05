@@ -1,14 +1,10 @@
-name: HF Sync
-
-on:
-  workflow_run:
-    workflows: ["Docker Push"]
-    types: [completed]
-
+name: Hugging Face Sync
+on: [push]
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: Sync to Hugging Face
-        run: |
-          echo "Syncing to Hugging Face repository"
+        run: echo 'Syncing to Hugging Face...'

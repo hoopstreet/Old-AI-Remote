@@ -1,15 +1,10 @@
 name: Release Notes
-
-on:
-  push:
-    paths:
-      - docs/CHANGELOG.md
-      - docs/Task.md
-
+on: [push]
 jobs:
   release-notes:
     runs-on: ubuntu-latest
     steps:
-      - name: Create Release Notes
-        run: |
-          echo "Release Notes from CHANGELOG and Task files"
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Generate release notes
+        run: echo 'Generating release notes...'

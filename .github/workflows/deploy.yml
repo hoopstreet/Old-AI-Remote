@@ -1,14 +1,10 @@
 name: Deploy
-
-on:
-  push:
-    branches:
-      - main
-
+on: [push]
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to server
-        run: |
-          # Add deploy commands here
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Deploy
+        run: echo 'Deploying...'

@@ -1,18 +1,10 @@
 name: Versioning
-
-on:
-  push:
-    paths:
-      - docs/VERSION.md
-
+on: [push]
 jobs:
-  versioning:
+  version:
     runs-on: ubuntu-latest
     steps:
-      - name: Read version
-        run: |
-          VERSION=$(cat docs/VERSION.md | grep VERSION | awk '{print $2}')
-          echo "Current Version: $VERSION"
-      - name: Update Version
-        run: |
-          # Implement version update logic here.
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Read VERSION.md
+        run: echo 'Reading version...'

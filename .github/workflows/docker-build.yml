@@ -1,14 +1,10 @@
 name: Docker Build
-
-on:
-  push:
-    branches:
-      - main
-
+on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: Build Docker image
-        run: |
-          echo "Building Docker image"
+        run: echo 'Building Docker image...'
