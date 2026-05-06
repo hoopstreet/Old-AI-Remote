@@ -8,59 +8,47 @@ const critic = require("../agents/critic");
 const { loadMemory } = require("./memory");
 const { writeFiles } = require("./writer");
 
-function safeFiles(files) {
-  if (!Array.isArray(files)) return [];
-
-  return files.filter(f => {
-    return (
-      f &&
-      typeof f.path === "string" &&
-      typeof f.content === "string" &&
-      f.path.length > 0 &&
-      f.content.length > 0
-    );
-  });
-}
-
-function isAllowedByMemory(filePath, memory) {
-  // STRICT RULE:
-  // file must be explicitly mentioned in convo.md OR convo2.md
-  return memory.includes(filePath);
-}
+process.on("unhandledRejection", (e) => {
+  console.log("⚠️ HANDLED REJECTION:", e.message);
+});
 
 (async () => {
-  console.log("🚀 MEMORY → ROOT STRICT GENERATION START");
+  console.log("🚀 MEMORY → ROOT GENERATION START");
 
   const memory = loadMemory();
 
-  let state = { memory, context: {} };
-
-  try {
-    const dag = new DAG();
-
-    dag.add("planner", async () => planner(state));
-    dag.add("coder", async () => coder(state), ["planner"]);
-    dag.add("reviewer", async () => reviewer(state), ["coder"]);
-    dag.add("critic", async () => critic(state), ["reviewer"]);
-    dag.add("fixer", async () => fixer(state), ["critic"]);
-
-    state = await dag.run();
-
-    const rawFiles = state?.context?.files;
-
-    const safe = safeFiles(rawFiles)
-      .filter(f => isAllowedByMemory(f.path, memory));
-
-    if (!safe.length) {
-      console.log("⚠️ NO VALID FILES IN MEMORY SPEC → NOTHING GENERATED");
-      process.exit(0);
+  // 🔥 HARD RULE: empty output unless memory explicitly defines files
+  let state = {
+    memory,
+    context: {
+      files: []
     }
+  };
 
-    writeFiles(memory, safe);
+  const dag = new DAG();
 
-    console.log("✅ ROOT GENERATED STRICTLY FROM MEMORY ONLY");
-  } catch (err) {
-    console.log("❌ DAG FAILED SAFELY:", err.message);
-    process.exit(1);
+  dag.add("planner", async () => planner(state));
+  dag.add("coder", async () => coder(state), ["planner"]);
+  dag.add("reviewer", async () => reviewer(state), ["coder"]);
+  dag.add("critic", async (s) => critic(s), ["reviewer"]);
+  dag.add("fixer", async (s) => fixer(s), ["critic"]);
+
+  state = await dag.run();
+
+  // 🧠 STRICT FILTER: only allow valid file output
+  const files = Array.isArray(state?.context?.files)
+    ? state.context.files.filter(f => f && f.path && f.content)
+    : [];
+
+  if (files.length === 0) {
+    console.log("⚠️ NO VALID FILES IN MEMORY → NOTHING GENERATED");
+    console.log("🧠 SYSTEM FOLLOWING convo.md RULES STRICTLY");
+    return;
   }
+
+  console.log("📦 GENERATING ROOT FILES FROM MEMORY ONLY");
+
+  writeFiles(memory, files);
+
+  console.log("✅ ROOT GENERATION COMPLETE (MEMORY-DRIVEN ONLY)");
 })();

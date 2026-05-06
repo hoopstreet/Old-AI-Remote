@@ -1,15 +1,10 @@
 const fs = require("fs");
 
-function writeFiles(files) {
-  if (!Array.isArray(files)) {
-    console.log("⚠️ No valid files to write");
-    return;
-  }
-
+function writeFiles(memory, files) {
   for (const f of files) {
     if (!f?.path || !f?.content) continue;
 
-    console.log("🧠 CREATED:", f.path);
+    console.log("🧠 CREATING:", f.path);
 
     fs.writeFileSync(f.path, f.content, "utf8");
   }
