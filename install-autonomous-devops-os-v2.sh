@@ -1,0 +1,50 @@
+#!/bin/sh
+
+echo "🧠 INSTALLING AUTONOMOUS DEVOPS OS v2 (SWARM + MEMORY + REASONING)"
+
+mkdir -p .github/workflows
+mkdir -p core
+mkdir -p memory/vector
+mkdir -p swarm
+mkdir -p docs
+mkdir -p Temporary\ Builder/memory
+
+# =========================
+# 🧠 GITHUB SWARM ENGINE
+# =========================
+cat > .github/workflows/devops-swarm.yml << 'YML'
+name: 🧠 DevOps OS v2 Swarm
+
+on:
+  push:
+    paths:
+      - "Temporary Builder/memory/**"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  swarm:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - run: npm install node-fetch
+
+      - name: Run Swarm Engine
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: node core/swarm-engine.js
+
+      - name: Auto PR Repair System
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: ai/swarm-v2
+          title: "🧠 Swarm DevOps OS v2 Update"
+          commit-message: "swarm autonomous update"

@@ -1,18 +1,18 @@
 #!/bin/sh
 
-echo "🚀 SAFE PUSH START"
+echo "🚀 SWARM PUSH"
 
 git add .
 
 if git diff --cached --quiet; then
-  echo "✅ No changes"
+  echo "✅ NO CHANGES"
   exit 0
 fi
 
-git commit -m "🧠 DEVOPS COGNITION CORE UPDATE"
+git commit -m "🧠 AUTONOMOUS DEVOPS OS v2 SWARM UPDATE"
 
 git pull --no-rebase origin main || true
 
 git push origin main || true
 
-echo "✅ PUSH DONE"
+echo "✅ PUSH COMPLETE"

@@ -1,0 +1,37 @@
+name: 🧠 Autonomous DevOps OS
+
+on:
+  push:
+    paths:
+      - "Temporary Builder/memory/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  devops-os:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - run: npm install node-fetch
+
+      - name: Run DevOps OS Engine
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: node core/devops-engine.js
+
+      - name: Auto PR System
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: ai/devops-os
+          title: "🧠 Autonomous DevOps OS Update"
+          commit-message: "autonomous system update"
+          body: "AI-generated DevOps OS execution"
