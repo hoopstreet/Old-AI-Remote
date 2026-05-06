@@ -1,24 +1,14 @@
-const crypto = require("crypto");
+const fs = require("fs");
 
-function hash(content) {
-  return crypto.createHash("sha256").update(content || "").digest("hex");
+function analyzeLogs() {
+  const file = "Temporary Builder/logs/build-history.json";
+  if (!fs.existsSync(file)) return null;
+
+  const logs = JSON.parse(fs.readFileSync(file));
+  return {
+    total: logs.length,
+    last: logs[logs.length - 1]
+  };
 }
 
-function buildDiff(oldFiles = {}, newFiles = []) {
-  const changes = [];
-
-  for (const file of newFiles) {
-    const oldHash = oldFiles[file.path];
-    const newHash = hash(file.content);
-
-    if (!oldHash) {
-      changes.push({ type: "NEW", file: file.path });
-    } else if (oldHash !== newHash) {
-      changes.push({ type: "MODIFIED", file: file.path });
-    }
-  }
-
-  return changes;
-}
-
-module.exports = { hash, buildDiff };
+module.exports = { analyzeLogs };

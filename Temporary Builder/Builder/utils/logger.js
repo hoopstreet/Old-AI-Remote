@@ -6,13 +6,13 @@ function logBuild(data) {
   let history = [];
   if (fs.existsSync(file)) {
     try {
-      history = JSON.parse(fs.readFileSync(file, "utf-8"));
+      history = JSON.parse(fs.readFileSync(file));
     } catch {}
   }
 
   history.push({
     time: new Date().toISOString(),
-    files: data.files || []
+    files: data.files || [],
   });
 
   fs.writeFileSync(file, JSON.stringify(history, null, 2));

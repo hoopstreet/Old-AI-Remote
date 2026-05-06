@@ -1,10 +1,9 @@
-name: TEMP AI BUILDER SELF HEAL ENGINE
+name: TEMP AI BUILDER
 
 on:
   push:
     paths:
-      - "Temporary Builder/memory/convo.md"
-      - "Temporary Builder/memory/convo2.md"
+      - "Temporary Builder/memory/**"
   workflow_dispatch:
 
 permissions:
@@ -16,29 +15,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      - name: Install
-        run: |
+      - run: |
           cd "Temporary Builder"
-          npm install || true
+          npm install
 
-      - name: Run Builder
+      - run: node "Temporary Builder/Builder/runner.js"
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-        run: |
-          node "Temporary Builder/Builder/runner.js"
-
-      - name: Auto Commit Fixes
-        run: |
-          git config user.name "AI-BOT"
-          git config user.email "ai@bot.local"
-          git add .
-          git diff --staged --quiet || git commit -m "🧠 AUTO SELF-HEAL"
-          git pull --rebase origin main || true
-          git push origin main || true
