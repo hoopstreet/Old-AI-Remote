@@ -4665,8 +4665,3 @@ To continue development:
 Then layer intelligence gradually.
 
 ⸻
-
-If you want, I can now convert this into:
-
-👉 FULL production-ready repo (iSH compatible, copy-paste blocks)
-with everything wired together exactly to your system.
