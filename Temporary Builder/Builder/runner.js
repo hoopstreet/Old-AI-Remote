@@ -2,57 +2,87 @@ const { runAI } = require("./brain");
 const { writeFiles } = require("./utils/writer");
 const { execSync } = require("child_process");
 const fs = require("fs");
-const { logBuild } = require("./utils/logger");
 const { scan } = require("./utils/analyzer");
 
+function fixYAML(filePath) {
+  try {
+    let content = fs.readFileSync(filePath, "utf8");
+
+    // basic auto-fix
+    content = content.replace(/\t/g, "  "); // no tabs in YAML
+    content = content.replace(/\r/g, "");
+
+    fs.writeFileSync(filePath, content);
+  } catch {}
+}
+
+function validateRepo() {
+  const required = [
+    "Temporary Builder/memory/convo.md",
+    "Temporary Builder/memory/convo2.md",
+    "Temporary Builder/Builder/brain.js",
+    "Temporary Builder/Builder/runner.js"
+  ];
+
+  for (const f of required) {
+    if (!fs.existsSync(f)) {
+      fs.writeFileSync(f, "");
+    }
+  }
+}
+
 (async () => {
-  console.log("🚀 TEMP BUILDER START");
+  console.log("🚀 TEMP AI BUILDER START");
+
+  validateRepo();
 
   const result = await runAI();
   if (!result) return;
 
-  // 🧠 WRITE FILES (ROOT SYSTEM OUTPUT)
+  // WRITE FILES
   writeFiles(result.files);
 
-  // 📊 SCAN FULL REPO (ANTI-DUPLICATE SYSTEM)
-  const repo = scan(".");
+  // SCAN REPO
+  const repoMap = scan(".");
 
-  // 🧾 BUILD REPORT (FULL INTELLIGENCE)
+  // SELF HEAL YAML FILES
+  repoMap.forEach(f => {
+    if (f.includes(".yml") || f.includes(".yaml")) {
+      fixYAML(f);
+    }
+  });
+
+  // AUTO RESTORE MISSING FILES
+  const criticalFiles = [
+    "README.md",
+    "Temporary Builder/docs/results.md"
+  ];
+
+  for (const file of criticalFiles) {
+    if (!fs.existsSync(file)) {
+      fs.writeFileSync(file, "# AUTO RESTORED FILE\n");
+    }
+  }
+
+  // RESULTS REPORT
   const report = `
-# 🧠 AI-REMOTE FULL REPORT
+# TEMP AI BUILDER REPORT
 
 ## GENERATED FILES
 ${result.files?.map(f => "- " + f.path).join("\n")}
 
-## REPOSITORY STATE
-${repo.slice(0, 200).map(f => "- " + f).join("\n")}
-
-## DEPENDENCIES
-${(result.install || []).join(", ")}
-
 ## SYSTEM STATUS
-- Temporary Builder: ACTIVE
-- Duplicate Prevention: ENABLED
-- Repo Scan: ACTIVE
+- Cron Auto Trigger: ACTIVE
+- Self Healing: ACTIVE
+- Repo Validator: ACTIVE
 
-## SELF-HEALING NOTES
-If GitHub Actions fails:
-- Check workflow YAML syntax
-- Ensure secrets exist in repo settings
-- Retry via push trigger (no manual execution required)
-
-## CREDENTIAL RULES
-NEVER hardcode:
-- OPENROUTER_API_KEY → GitHub Secrets
-- TG_BOT_TOKEN → GitHub Secrets
-- SUPABASE keys → GitHub Secrets
+## REPO SCAN SIZE
+${repoMap.length} files detected
 `;
 
   fs.writeFileSync("Temporary Builder/docs/results.md", report);
 
-  logBuild(result);
-
-  // 🧠 AUTO COMMIT SYSTEM
+  // GIT SYNC
   execSync("git config user.name 'AI-BOT'");
   execSync("git config user.email 'ai@bot.local'");
 
@@ -61,9 +91,9 @@ NEVER hardcode:
   const changed = execSync("git status --porcelain").toString();
   if (!changed) return;
 
-  execSync("git commit -m '🧠 AUTO BUILD + SELF HEAL UPDATE' || true");
+  execSync("git commit -m '🧠 AUTO HEAL + CRON BUILD UPDATE' || true");
   execSync("git pull --rebase origin main || true");
   execSync("git push origin main || true");
 
-  console.log("✅ BUILD COMPLETE");
+  console.log("✅ SYSTEM LOOP COMPLETE");
 })();
