@@ -1,0 +1,23 @@
+{
+  "analysis": {
+    "type": "UNKNOWN",
+    "impact": 10
+  },
+  "decision": {
+    "safe": true,
+    "level": "LOW"
+  },
+  "affected_files": [
+    "README.md",
+    "Temporary Builder/memory/convo.md"
+  ],
+  "graph": {
+    "README.md": [
+      "docs/project.md"
+    ],
+    "docs/project.md": [],
+    "Temporary Builder/memory/convo.md": [
+      "docs/project.md"
+    ]
+  }
+}

@@ -1,3 +1,15 @@
+#!/bin/sh
+
+echo "🧠 INSTALLING V11 AUTONOMOUS COGNITION LAYER..."
+
+mkdir -p "Temporary Builder/Builder/utils"
+mkdir -p "Temporary Builder/memory"
+mkdir -p "docs"
+
+# ----------------------------
+# V11 COGNITION ENGINE
+# ----------------------------
+cat > "Temporary Builder/Builder/runner.js" << 'JS'
 const fs = require("fs");
 
 function read(p){
@@ -114,3 +126,41 @@ function run(){
 }
 
 run();
+JS
+
+# ----------------------------
+# MEMORY STRUCTURE
+# ----------------------------
+echo "# ENTRY NODE" > "Temporary Builder/memory/convo.md"
+echo "# FINAL NODE" > "Temporary Builder/memory/convo2.md"
+echo "# COGNITION MEMORY" > "Temporary Builder/memory/temp.md"
+
+# ----------------------------
+# PUSH SYSTEM
+# ----------------------------
+cat > push.sh << 'SH'
+#!/bin/sh
+
+echo "🚀 V11 SAFE PUSH"
+
+git add .
+
+if git diff --cached --quiet; then
+  echo "✅ NO CHANGES"
+  exit 0
+fi
+
+git commit -m "🧠 V11 COGNITION LAYER"
+
+git pull --no-rebase origin main || true
+
+git push origin main || true
+
+echo "✅ PUSH COMPLETE"
+SH
+
+chmod +x push.sh
+
+echo "✅ V11 INSTALLED"
+echo "👉 RUN: node Temporary Builder/Builder/runner.js"
+echo "👉 PUSH: sh push.sh"

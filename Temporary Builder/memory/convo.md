@@ -1,1 +1,1 @@
-# ENTRY SPEC
+# ENTRY NODE
