@@ -8,36 +8,28 @@ const fixer = require("../agents/fixer");
 const { loadMemory } = require("./memory");
 const { writeFiles } = require("./writer");
 
-process.on("unhandledRejection", (err) => {
-  console.log("⚠️ HANDLED PROMISE ERROR:", err.message);
-});
-
-process.on("uncaughtException", (err) => {
-  console.log("⚠️ UNCAUGHT ERROR:", err.message);
+process.on("unhandledRejection", (e) => {
+  console.log("⚠️ HANDLED REJECTION:", e.message);
 });
 
 (async () => {
-  try {
-    console.log("🚀 SAFE AI DAG START");
+  console.log("🚀 STABLE AI DAG START");
 
-    const memory = loadMemory();
+  const memory = loadMemory();
 
-    let state = { memory, context: {} };
+  let state = { memory, context: {} };
 
-    const dag = new DAG();
+  const dag = new DAG();
 
-    dag.add("planner", async () => planner(state));
-    dag.add("coder", async () => coder(state), ["planner"]);
-    dag.add("reviewer", async () => reviewer(state), ["coder"]);
-    dag.add("critic", async (s) => critic(s), ["reviewer"]);
-    dag.add("fixer", async (s) => fixer(s), ["critic"]);
+  dag.add("planner", async () => planner(state));
+  dag.add("coder", async () => coder(state), ["planner"]);
+  dag.add("reviewer", async () => reviewer(state), ["coder"]);
+  dag.add("critic", async (s) => critic(s), ["reviewer"]);
+  dag.add("fixer", async (s) => fixer(s), ["critic"]);
 
-    state = await dag.run();
+  state = await dag.run();
 
-    writeFiles(state.memory, state.context.files || []);
+  writeFiles(state.memory, state.context.files || []);
 
-    console.log("✅ SAFE DAG COMPLETE");
-  } catch (e) {
-    console.log("❌ DAG FAILED SAFELY:", e.message);
-  }
+  console.log("✅ STABLE GENERATION COMPLETE");
 })();

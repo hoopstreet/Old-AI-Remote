@@ -1,23 +1,37 @@
 const { callOpenRouter } = require("../core/llm");
+const { safeJSON } = require("../core/json-safe");
 
 module.exports = async function coder(state) {
   const prompt = `
 You are Coder AI.
-Create FULL WORKING CODE based on this plan:
 
+IMPORTANT:
+Return ONLY valid JSON array:
+[
+  { "path": "file.js", "content": "code here" }
+]
+
+NO explanation. NO markdown. ONLY JSON.
+
+Project:
 ${state.context.plan}
-
-Return JSON:
-[{path, content}]
 `;
 
   const res = await callOpenRouter(prompt);
 
+  const parsed = safeJSON(res);
+
+  if (!parsed) {
+    console.log("❌ INVALID JSON FROM AI - RETRYING SAFE MODE");
+
+    return {
+      ...state,
+      context: { files: [] }
+    };
+  }
+
   return {
     ...state,
-    context: {
-      ...state.context,
-      files: JSON.parse(res)
-    }
+    context: { ...state.context, files: parsed }
   };
 };

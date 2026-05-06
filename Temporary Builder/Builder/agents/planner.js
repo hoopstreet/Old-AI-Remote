@@ -2,12 +2,18 @@ const { callOpenRouter } = require("../core/llm");
 
 module.exports = async function planner(state) {
   const prompt = `
-You are Planner AI.
-Analyze this project request:
+Return ONLY a short structured plan.
 
+NO sentences.
+NO explanations.
+
+Format:
+- files
+- features
+- structure
+
+Input:
 ${state.memory}
-
-Return JSON plan of files to generate.
 `;
 
   const res = await callOpenRouter(prompt);
