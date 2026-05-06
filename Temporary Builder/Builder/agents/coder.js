@@ -4,31 +4,51 @@ const { safeJSON } = require("../core/json-safe");
 module.exports = async function coder(state) {
 
   const prompt = `
-You are a production code generator.
+YOU ARE A PRODUCTION CODE GENERATOR.
 
 RULES:
-- Output ONLY valid JSON array
+- ONLY output VALID JSON
 - NO markdown
 - NO explanation
+- NO text outside JSON
+- MUST be a list of files
 
 FORMAT:
 [
-  { "path": "app.js", "content": "console.log('app');" }
+  {
+    "path": "app.js",
+    "content": "// working node app"
+  },
+  {
+    "path": "index.html",
+    "content": "<html></html>"
+  }
 ]
 
-PROJECT:
+PROJECT SPEC:
 ${state.memory}
 `;
 
-  const res = await callOpenRouter(prompt);
+  try {
+    const res = await callOpenRouter(prompt);
 
-  const parsed = safeJSON(res);
+    const parsed = safeJSON(res);
 
-  return {
-    ...state,
-    context: {
-      ...state.context,
-      files: parsed || []
+    if (!parsed || !Array.isArray(parsed)) {
+      console.log("❌ CODER FAILED: invalid JSON output");
+      return { ...state, context: { files: [] } };
     }
-  };
+
+    return {
+      ...state,
+      context: {
+        ...state.context,
+        files: parsed
+      }
+    };
+
+  } catch (err) {
+    console.log("❌ CODER CRASH:", err.message);
+    return { ...state, context: { files: [] } };
+  }
 };
