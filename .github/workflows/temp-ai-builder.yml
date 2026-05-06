@@ -1,36 +1,67 @@
-name: TEMP AI BUILDER (LOCKED SYSTEM)
+name: 🧠 Autonomous DevOps Builder
 
 on:
   push:
-    branches: [ main ]
     paths:
-      - "Temporary Builder/**"
-      - "convo.md"
-      - "convo2.md"
+      - 'Temporary Builder/memory/convo.md'
+      - 'Temporary Builder/memory/convo2.md'
+  workflow_dispatch:
+  schedule:
+    - cron: "*/30 * * * *"
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - name: 📥 Checkout
+        uses: actions/checkout@v3
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: 🧠 Setup Node
+        uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      - name: Install dependencies
-        run: npm install node-fetch || true
-
-      - name: Run AI Builder Engine
-        run: node "Temporary Builder/Builder/runner.js"
-
-      - name: Commit Generated Output
+      - name: 📦 Install deps
         run: |
-          git config user.name "ai-builder"
-          git config user.email "ai@bot.local"
+          cd "Temporary Builder"
+          npm install || true
+
+      - name: 🧠 Run DevOps Brain
+        run: |
+          node "Temporary Builder/Builder/runner.js"
+
+      - name: 🧠 Run DAG Engine (if exists)
+        run: |
+          if [ -f "Temporary Builder/Builder/dag-runner.js" ]; then
+            node "Temporary Builder/Builder/dag-runner.js"
+          fi
+
+      - name: 🧠 Run Swarm Engine (if exists)
+        run: |
+          if [ -f "Temporary Builder/Builder/swarm.js" ]; then
+            node "Temporary Builder/Builder/swarm.js"
+          fi
+
+      - name: 🧠 Self-Healing Workflow Check
+        run: |
+          if [ -f "Temporary Builder/utils/workflow-repair.js" ]; then
+            node "Temporary Builder/utils/workflow-repair.js"
+          fi
+
+      - name: 🧠 Commit Changes
+        run: |
+          git config --global user.name "AI-BOT"
+          git config --global user.email "actions@github.com"
+
           git add .
-          git commit -m "🧠 AUTO BUILD FROM TEMP BUILDER" || true
-          git push || true
+
+          if git diff --cached --quiet; then
+            echo "✅ No changes"
+            exit 0
+          fi
+
+          git commit -m "🧠 AUTO BUILD (DevOps Brain)"
+
+          git pull --no-rebase origin main || true
+          git push origin main || true
