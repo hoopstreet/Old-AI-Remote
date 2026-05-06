@@ -1,12 +1,12 @@
 const DAG = require("../dag");
+const { loadMemory } = require("./memory");
+const { writeFiles } = require("./writer");
+
 const planner = require("../agents/planner");
 const coder = require("../agents/coder");
 const reviewer = require("../agents/reviewer");
-const fixer = require("../agents/fixer");
 const critic = require("../agents/critic");
-
-const { loadMemory } = require("./memory");
-const { writeFiles } = require("./writer");
+const fixer = require("../agents/fixer");
 
 process.on("unhandledRejection", (e) => {
   console.log("⚠️ HANDLED REJECTION:", e.message);
@@ -17,38 +17,50 @@ process.on("unhandledRejection", (e) => {
 
   const memory = loadMemory();
 
-  // 🔥 HARD RULE: empty output unless memory explicitly defines files
-  let state = {
-    memory,
-    context: {
-      files: []
-    }
-  };
+  if (!memory || !memory.raw.includes("convo")) {
+    console.log("❌ NO MEMORY FOUND → STOP");
+    return;
+  }
+
+  let state = { memory, context: {} };
 
   const dag = new DAG();
 
   dag.add("planner", async () => planner(state));
-  dag.add("coder", async () => coder(state), ["planner"]);
-  dag.add("reviewer", async () => reviewer(state), ["coder"]);
-  dag.add("critic", async (s) => critic(s), ["reviewer"]);
-  dag.add("fixer", async (s) => fixer(s), ["critic"]);
 
-  state = await dag.run();
+  dag.add("coder", async () => {
+    if (!state.context.plan) {
+      console.log("❌ NO PLAN → SKIP CODER");
+      return state;
+    }
+    return coder(state);
+  }, ["planner"]);
 
-  // 🧠 STRICT FILTER: only allow valid file output
-  const files = Array.isArray(state?.context?.files)
-    ? state.context.files.filter(f => f && f.path && f.content)
-    : [];
+  dag.add("reviewer", async () => {
+    if (!state.context.files) {
+      console.log("⚠️ NO FILES → SKIP REVIEW");
+      return state;
+    }
+    return reviewer(state);
+  }, ["coder"]);
 
-  if (files.length === 0) {
-    console.log("⚠️ NO VALID FILES IN MEMORY → NOTHING GENERATED");
-    console.log("🧠 SYSTEM FOLLOWING convo.md RULES STRICTLY");
+  dag.add("critic", async () => state.context.files ? critic(state) : state, ["reviewer"]);
+
+  dag.add("fixer", async () => state.context.files ? fixer(state) : state, ["critic"]);
+
+  try {
+    state = await dag.run();
+  } catch (e) {
+    console.log("❌ DAG FAILED:", e.message);
     return;
   }
 
-  console.log("📦 GENERATING ROOT FILES FROM MEMORY ONLY");
+  if (!state || !state.context || !state.context.files) {
+    console.log("⚠️ NO VALID OUTPUT → NOTHING GENERATED (SAFE MODE)");
+    return;
+  }
 
-  writeFiles(memory, files);
+  writeFiles(state.context.files);
 
-  console.log("✅ ROOT GENERATION COMPLETE (MEMORY-DRIVEN ONLY)");
+  console.log("✅ MEMORY → ROOT COMPLETE");
 })();
