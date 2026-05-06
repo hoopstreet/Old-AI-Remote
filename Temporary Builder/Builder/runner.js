@@ -1,87 +1,84 @@
-const { runAI } = require("./brain");
-const { writeFiles } = require("./utils/writer");
-const { logBuild } = require("./utils/logger");
 const fs = require("fs");
+const { runBrain } = require("./brain");
 const { execSync } = require("child_process");
 
 function safeExec(cmd) {
   try {
     return execSync(cmd, { stdio: "inherit" });
   } catch (e) {
-    console.log("⚠️ FAIL:", cmd);
-    return null;
+    console.log("⚠️ SKIP:", cmd);
   }
 }
 
+function writeFileSafe(path, content) {
+  const dir = path.split("/").slice(0, -1).join("/");
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path, content || "");
+  console.log("✔", path);
+}
+
 (async () => {
-  console.log("🚀 TEMP BUILDER START");
+  console.log("🚀 SAFE BUILDER START");
 
-  const result = await runAI();
-
-  if (!result) {
-    console.log("❌ AI FAILED");
-    process.exit(1);
+  let result;
+  try {
+    result = await runBrain();
+  } catch (e) {
+    console.log("❌ BRAIN FAILED → fallback");
+    result = null;
   }
 
-  // WRITE FILES
-  writeFiles(result.files);
+  if (!result || !result.files) {
+    result = {
+      files: [
+        {
+          path: "Temporary Builder/docs/summary.md",
+          content: "# Safe build fallback mode active"
+        }
+      ]
+    };
+  }
 
-  // SAVE RAW OUTPUT
-  fs.writeFileSync(
-    "Temporary Builder/docs/raw.txt",
-    JSON.stringify(result, null, 2)
+  // WRITE ROOT + TEMP FILES
+  for (const f of result.files) {
+    writeFileSafe(f.path, f.content);
+  }
+
+  // AUTO CREATE CREDENTIAL DOC
+  writeFileSafe(
+    "docs/tools-credentials.md",
+`# 🔐 Tools Credentials Map
+
+## GitHub Actions
+- GITHUB_TOKEN → auto provided
+
+## AI APIs
+- OPENROUTER_API_KEY → add in GitHub Secrets
+
+## Deploy Platforms
+- Northflank → NF_TOKEN
+- Render → RENDER_API_KEY
+- Railway → RAILWAY_TOKEN
+
+⚠️ NEVER hardcode secrets
+`
   );
 
-  // BUILD SUMMARY
-  const summary = `
-# 🧠 AI BUILD RESULTS
+  // SAFE GIT FLOW (NO REBASE)
+  safeExec("git config user.name 'AI-BOT'");
+  safeExec("git config user.email 'ai@bot.local'");
+  safeExec("git add .");
 
-## 📦 Files Generated
-${result.files?.map(f => "- " + f.path).join("\n")}
+  const status = execSync("git status --porcelain").toString();
 
-## ⚙️ Dependencies
-${(result.install || []).join(", ")}
-
-## ✅ STATUS
-SELF-HEAL ACTIVE
-`;
-
-  fs.writeFileSync("Temporary Builder/docs/results.md", summary);
-
-  // LOG HISTORY
-  logBuild(result);
-
-  // SAFE GIT FLOW (NO REBASE LOOP)
-  try {
-    safeExec("git config user.name 'AI-BOT'");
-    safeExec("git config user.email 'ai@bot.local'");
-
-    safeExec("git add .");
-
-    const changed = execSync("git status --porcelain").toString();
-
-    if (!changed) {
-      console.log("✅ NO CHANGES");
-      return;
-    }
-
-    safeExec("git commit -m '🧠 AUTO BUILD UPDATE'");
-
-    // SAFE SYNC STRATEGY (NO REBASE)
-    safeExec("git fetch origin");
-    safeExec("git merge origin/main --no-edit || true");
-
-    safeExec("git push origin main");
-
-  } catch (e) {
-    console.log("⚠️ GIT FAILURE → RESET");
-
-    try {
-      safeExec("git reset --hard origin/main");
-    } catch {}
-
-    console.log("♻️ RECOVERED");
+  if (!status) {
+    console.log("✅ NO CHANGES");
+    return;
   }
 
-  console.log("✅ COMPLETE");
+  safeExec("git commit -m '🧠 SAFE AUTO BUILD'");
+  safeExec("git pull --no-rebase origin main || true");
+  safeExec("git push origin main || true");
+
+  console.log("✅ DONE");
 })();

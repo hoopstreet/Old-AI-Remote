@@ -1,15 +1,10 @@
-# TEMP BUILDER MEMORY
+# 🧠 TEMP BUILDER MEMORY
 
-This file is used ONLY for internal builder logic.
+ENTRY → convo.md
+FINAL → convo2.md
 
-Rules:
-- Never generate files from here into root
-- Only used to improve builder behavior
-- Store patterns, fixes, and system knowledge
-
-Separation:
-- convo.md → project build instructions
-- convo2.md → secondary system (e.g. telegram)
-- temp.md → builder internal memory
-
-Do NOT mix responsibilities.
+RULES:
+- root repo = final project output
+- Temporary Builder = internal system only
+- NEVER mix outputs
+- NEVER touch workflow unless needed
