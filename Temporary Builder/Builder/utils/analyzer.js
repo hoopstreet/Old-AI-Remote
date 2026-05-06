@@ -1,24 +1,24 @@
-const fs = require("fs");
-const path = require("path");
+const crypto = require("crypto");
 
-function scan(dir, list = []) {
-  if (!fs.existsSync(dir)) return list;
+function hash(content) {
+  return crypto.createHash("sha256").update(content || "").digest("hex");
+}
 
-  const files = fs.readdirSync(dir);
+function buildDiff(oldFiles = {}, newFiles = []) {
+  const changes = [];
 
-  for (const file of files) {
-    const full = path.join(dir, file);
+  for (const file of newFiles) {
+    const oldHash = oldFiles[file.path];
+    const newHash = hash(file.content);
 
-    if (file === "node_modules" || file === ".git") continue;
-
-    if (fs.statSync(full).isDirectory()) {
-      scan(full, list);
-    } else {
-      list.push(full);
+    if (!oldHash) {
+      changes.push({ type: "NEW", file: file.path });
+    } else if (oldHash !== newHash) {
+      changes.push({ type: "MODIFIED", file: file.path });
     }
   }
 
-  return list;
+  return changes;
 }
 
-module.exports = { scan };
+module.exports = { hash, buildDiff };

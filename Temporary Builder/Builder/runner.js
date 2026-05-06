@@ -1,99 +1,72 @@
 const { runAI } = require("./brain");
 const { writeFiles } = require("./utils/writer");
-const { execSync } = require("child_process");
 const fs = require("fs");
-const { scan } = require("./utils/analyzer");
+const { execSync } = require("child_process");
 
-function fixYAML(filePath) {
-  try {
-    let content = fs.readFileSync(filePath, "utf8");
+const INDEX = "Temporary Builder/memory/repo-index.json";
 
-    // basic auto-fix
-    content = content.replace(/\t/g, "  "); // no tabs in YAML
-    content = content.replace(/\r/g, "");
-
-    fs.writeFileSync(filePath, content);
-  } catch {}
+function loadIndex() {
+  return JSON.parse(fs.readFileSync(INDEX, "utf-8"));
 }
 
-function validateRepo() {
-  const required = [
-    "Temporary Builder/memory/convo.md",
-    "Temporary Builder/memory/convo2.md",
-    "Temporary Builder/Builder/brain.js",
-    "Temporary Builder/Builder/runner.js"
-  ];
-
-  for (const f of required) {
-    if (!fs.existsSync(f)) {
-      fs.writeFileSync(f, "");
-    }
-  }
+function saveIndex(i) {
+  fs.writeFileSync(INDEX, JSON.stringify(i, null, 2));
 }
 
 (async () => {
-  console.log("🚀 TEMP AI BUILDER START");
+  console.log("🚀 TEMP BUILDER v2 START");
 
-  validateRepo();
+  try {
+    const result = await runAI();
 
-  const result = await runAI();
-  if (!result) return;
+    if (!result) throw new Error("AI failed");
 
-  // WRITE FILES
-  writeFiles(result.files);
+    // WRITE FILES
+    writeFiles(result.files || []);
 
-  // SCAN REPO
-  const repoMap = scan(".");
+    // SAVE RAW
+    fs.writeFileSync(
+      "Temporary Builder/docs/raw.txt",
+      JSON.stringify(result, null, 2)
+    );
 
-  // SELF HEAL YAML FILES
-  repoMap.forEach(f => {
-    if (f.includes(".yml") || f.includes(".yaml")) {
-      fixYAML(f);
+    // UPDATE INDEX META
+    const index = loadIndex();
+    index.lastBuild = new Date().toISOString();
+    saveIndex(index);
+
+    // GIT AUTO COMMIT
+    execSync("git config user.name 'TEMP-AI'");
+    execSync("git config user.email 'ai@bot.local'");
+
+    execSync("git add .");
+
+    const changes = execSync("git status --porcelain").toString();
+    if (!changes) {
+      console.log("No changes");
+      return;
     }
-  });
 
-  // AUTO RESTORE MISSING FILES
-  const criticalFiles = [
-    "README.md",
-    "Temporary Builder/docs/results.md"
-  ];
+    execSync("git commit -m '🤖 auto build v2'");
+    execSync("git pull --rebase origin main || true");
+    execSync("git push origin main || true");
 
-  for (const file of criticalFiles) {
-    if (!fs.existsSync(file)) {
-      fs.writeFileSync(file, "# AUTO RESTORED FILE\n");
-    }
+    console.log("✅ BUILD COMPLETE");
+  } catch (e) {
+    console.log("❌ ERROR:", e.message);
+
+    // 💀 AUTO FAILURE TRACKING
+    const index = loadIndex();
+    index.failures.push({
+      time: new Date().toISOString(),
+      error: e.message
+    });
+    saveIndex(index);
+
+    // 🔁 AUTO ROLLBACK
+    try {
+      execSync("git revert HEAD --no-edit");
+      execSync("git push origin main");
+    } catch {}
   }
-
-  // RESULTS REPORT
-  const report = `
-# TEMP AI BUILDER REPORT
-
-## GENERATED FILES
-${result.files?.map(f => "- " + f.path).join("\n")}
-
-## SYSTEM STATUS
-- Cron Auto Trigger: ACTIVE
-- Self Healing: ACTIVE
-- Repo Validator: ACTIVE
-
-## REPO SCAN SIZE
-${repoMap.length} files detected
-`;
-
-  fs.writeFileSync("Temporary Builder/docs/results.md", report);
-
-  // GIT SYNC
-  execSync("git config user.name 'AI-BOT'");
-  execSync("git config user.email 'ai@bot.local'");
-
-  execSync("git add .");
-
-  const changed = execSync("git status --porcelain").toString();
-  if (!changed) return;
-
-  execSync("git commit -m '🧠 AUTO HEAL + CRON BUILD UPDATE' || true");
-  execSync("git pull --rebase origin main || true");
-  execSync("git push origin main || true");
-
-  console.log("✅ SYSTEM LOOP COMPLETE");
 })();
