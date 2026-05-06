@@ -4,29 +4,31 @@ class DAG {
   }
 
   add(name, fn, deps = []) {
-    this.nodes.set(name, { fn, deps, result: null, done: false });
-  }
-
-  async runNode(name) {
-    const node = this.nodes.get(name);
-    if (!node) return;
-
-    for (const dep of node.deps) {
-      await this.runNode(dep);
-    }
-
-    if (!node.done) {
-      node.result = await node.fn();
-      node.done = true;
-    }
-
-    return node.result;
+    this.nodes.set(name, { fn, deps, done: false });
   }
 
   async run() {
+    const runNode = async (name, ctx) => {
+      const node = this.nodes.get(name);
+
+      for (const d of node.deps) {
+        await runNode(d, ctx);
+      }
+
+      if (!node.done) {
+        node.result = await node.fn(ctx);
+        node.done = true;
+      }
+
+      return node.result;
+    };
+
+    const ctx = {};
     for (const key of this.nodes.keys()) {
-      await this.runNode(key);
+      await runNode(key, ctx);
     }
+
+    return ctx;
   }
 }
 

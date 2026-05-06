@@ -1,6 +1,10 @@
-const { generate } = require("../core/llm");
+module.exports = async function planner(state) {
+  console.log("🧠 PLANNER AGENT");
 
-module.exports = async (state) => {
-  state.plan = await generate("PLAN THIS PROJECT:\n" + state.convo);
+  state.context.plan = {
+    goal: "Generate structured project from convo memory",
+    steps: ["analyze", "build", "review", "fix"]
+  };
+
   return state;
 };

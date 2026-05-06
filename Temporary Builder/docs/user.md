@@ -1,93 +1,43 @@
-# 👤 USER GUIDE — TEMPORARY BUILDER
+# 📘 User Guide – Autonomous AI Engineering OS
 
-## 🚀 HOW TO CONTROL SYSTEM
-
-Edit:
-
-Temporary Builder/memory/convo.md  
-Temporary Builder/memory/convo2.md  
-
-These define what the AI builds.
+## WHAT THIS SYSTEM IS
+A self-operating AI software builder that converts text instructions into working code.
 
 ---
 
-## ▶️ TRIGGER BUILD
+## HOW TO USE
 
-git add .
-git commit -m "update instructions"
-git push
+You only edit:
 
-→ GitHub Actions runs automatically
+### 🟡 convo.md
+Write your project idea here.
 
----
-
-## 🧠 WHAT SYSTEM DOES
-
-1. Reads instructions
-2. Generates real code
-3. Writes into root repo
-4. Repairs workflows
-5. Commits updates
-6. Logs everything
+### 🟢 convo2.md
+Refine or finalize instructions here.
 
 ---
 
-## 📂 OUTPUT LOCATION
+## WHAT HAPPENS AUTOMATICALLY
 
-Generated files go to:
-
-ROOT REPOSITORY
-
-NOT inside Temporary Builder
-
----
-
-## 🔧 TROUBLESHOOTING
-
-❌ No output:
-- Check convo.md content
-
-❌ AI error:
-- Check OPENROUTER_API_KEY
-
-❌ Workflow failure:
-- System auto-fixes next run
+1. AI reads your instructions
+2. Planner creates execution plan
+3. Coder generates code
+4. Reviewer checks correctness
+5. Critic detects failures
+6. Fixer repairs issues
+7. System writes final files
 
 ---
 
-## 🔐 REQUIRED SETUP
+## ADVANCED FEATURES
 
-GitHub Secrets:
-
-OPENROUTER_API_KEY
-
----
-
-## 📊 LOGS
-
-Temporary Builder/logs/build-history.json
+- OpenRouter AI integration
+- automatic rollback on crash
+- semantic memory storage
+- multi-agent execution system
 
 ---
 
-## ⚠️ IMPORTANT RULES
+## RESULT
 
-DO NOT:
-- manually break workflows
-- delete builder files
-- mix builder with output files
-
----
-
-## 🧠 BEST PRACTICE
-
-- Keep instructions clear
-- Avoid duplicates
-- Define exact build goals
-
----
-
-## ✅ CONTROL POINT
-
-Everything is controlled via:
-
-convo.md + convo2.md
+You get fully generated software systems without manually coding.

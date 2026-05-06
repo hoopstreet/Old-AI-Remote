@@ -1,103 +1,62 @@
-# 🧠 TEMPORARY BUILDER — FINAL SYSTEM SUMMARY
+# 🧠 Autonomous AI Engineering OS v3 (Production DAG System)
 
-## ✅ SYSTEM STATUS: PRODUCTION READY
-
-This repository contains a self-healing AI DevOps builder that:
-
-- Reads instructions from convo.md and convo2.md
-- Generates real working code into repository root
-- Automatically fixes GitHub workflows
-- Maintains memory + logs
-- Commits and syncs changes autonomously
+## SYSTEM TYPE
+Multi-agent DAG-based autonomous AI engineering system using OpenRouter.
 
 ---
 
-## 🧠 CORE FLOW
+## 🧠 CORE AGENTS
 
-convo.md + convo2.md  
-→ AI (brain.js)  
-→ parser + cleaner  
-→ runner.js  
-→ writeFiles()  
-→ root repo output  
-→ workflow repair  
-→ git auto commit  
+### 1. Planner
+Defines execution strategy from memory input.
 
----
+### 2. Coder
+Generates application code from plan.
 
-## 📦 BUILDER COMPONENTS
+### 3. Reviewer
+Validates structure and correctness.
 
-Temporary Builder/
+### 4. Critic
+Detects failure conditions before execution completes.
 
-Builder/
-- brain.js → AI generation
-- runner.js → execution engine
-
-utils/
-- analyzer.js → log analysis
-- cleaner.js → output cleanup
-- parser.js → JSON parser
-- writer.js → file writer
-- workflow-repair.js → auto fix workflows
-
-memory/
-- convo.md → instructions
-- convo2.md → secondary logic
-- repo-index.json → system memory
-- vector-db.json → history
-- architecture.json → structure
-
-docs/
-- raw.txt → raw AI output
-- results.md → latest build summary
-- summary.md → this file
-
-logs/
-- build-history.json → all runs
+### 5. Fixer
+Repairs broken or missing outputs automatically.
 
 ---
 
-## 🔐 REQUIRED SECRET
+## 🔁 EXECUTION ENGINE
 
-GitHub → Settings → Secrets:
-
-OPENROUTER_API_KEY
-
----
-
-## ⚙️ AUTOMATION
-
-GitHub Actions:
-.github/workflows/temp-ai-builder.yml
-
-Triggers:
-- push to convo files
-- manual run
-- cron (30 min)
-
----
-
-## 🔁 SELF-HEAL FEATURES
-
-✔ broken workflow detection  
-✔ auto YAML repair  
-✔ auto commit fixes  
-✔ rollback on failure  
-✔ memory-based analysis  
-
----
-
-## ⚠️ LIMITS
-
+- DAG-based execution graph
+- Controlled dependency resolution
 - No infinite loops
-- GitHub-controlled execution
-- AI depends on input quality
+- Ordered execution pipeline
 
 ---
 
-## 🚀 FINAL STATE
+## 🧠 MEMORY SYSTEM
 
-✔ Autonomous builder  
-✔ Self-healing CI  
-✔ Memory-aware system  
-✔ Root-level code generation  
+- convo.md → input instructions
+- convo2.md → final refinement
+- vector-db.json → persistent semantic memory
+
+---
+
+## 🔁 FAILURE HANDLING
+
+- state snapshot before execution
+- rollback on crash or invalid output
+- critic agent prevents broken writes
+
+---
+
+## ⚙️ LLM INTEGRATION
+
+- OpenRouter API used per agent
+- centralized llm.js gateway
+- production-safe prompt routing
+
+---
+
+## 🚀 SYSTEM GOAL
+
+Transform natural language into safe, validated, production-ready software using autonomous multi-agent execution.

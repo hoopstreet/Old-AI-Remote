@@ -1,27 +1,50 @@
-const DAG = require("./core/dag");
-const { loadState } = require("./core/state");
-const { safeWrite } = require("./core/writer");
-
+const DAG = require("./dag");
 const planner = require("./agents/planner");
-const builder = require("./agents/builder");
+const coder = require("./agents/coder");
 const reviewer = require("./agents/reviewer");
-const repair = require("./agents/repair");
+const fixer = require("./agents/fixer");
+const critic = require("./agents/critic");
+
+const { loadMemory, addMemory } = require("./memory");
+const { snapshot, restore } = require("./rollback");
+const fs = require("fs");
+
+function writeFiles(files) {
+  for (const f of files || []) {
+    fs.writeFileSync(f.path, f.content);
+  }
+}
 
 (async () => {
-  console.log("🚀 PRODUCTION DAG BRAIN START");
+  console.log("🚀 PRODUCTION DAG SWARM START");
 
-  const state = loadState();
-  const dag = new DAG();
+  let state = { memory: loadMemory(), context: {} };
 
-  dag.add("plan", async () => planner(state));
-  dag.add("build", async () => builder(state), ["plan"]);
-  dag.add("review", async () => reviewer(state), ["build"]);
-  dag.add("repair", async () => repair(state), ["review"]);
+  snapshot(state);
 
-  await dag.run();
+  try {
+    const dag = new DAG();
 
-  // FINAL OUTPUT ONLY GOES TO ROOT
-  safeWrite("app.generated.js", state.fixed || state.review || state.build);
+    dag.add("planner", async () => planner(state));
+    dag.add("coder", async () => coder(state), ["planner"]);
+    dag.add("reviewer", async () => reviewer(state), ["coder"]);
+    dag.add("critic", async () => critic(state), ["reviewer"]);
+    dag.add("fixer", async () => fixer(state), ["critic"]);
 
-  console.log("✅ DAG COMPLETE");
+    state = await dag.run();
+
+    if (state.context.failed) {
+      console.log("🔁 FAILURE DETECTED → ROLLBACK");
+      state = restore();
+    }
+
+    writeFiles(state.context.files);
+
+    addMemory({ event: "execution_complete" });
+
+    console.log("✅ DAG COMPLETE");
+  } catch (e) {
+    console.log("💥 CRASH → ROLLBACK ACTIVE");
+    state = restore();
+  }
 })();
