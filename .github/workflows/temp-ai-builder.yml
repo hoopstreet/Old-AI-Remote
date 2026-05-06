@@ -1,4 +1,4 @@
-name: TEMP AI BUILDER (MASTER SYSTEM)
+name: TEMP AI BUILDER (LOCKED SYSTEM)
 
 on:
   push:
@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Setup Node
@@ -22,7 +22,15 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: npm install node-fetch
+        run: npm install node-fetch || true
 
-      - name: Run Builder
+      - name: Run AI Builder Engine
         run: node "Temporary Builder/Builder/runner.js"
+
+      - name: Commit Generated Output
+        run: |
+          git config user.name "ai-builder"
+          git config user.email "ai@bot.local"
+          git add .
+          git commit -m "🧠 AUTO BUILD FROM TEMP BUILDER" || true
+          git push || true

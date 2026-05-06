@@ -1,8 +1,0 @@
-{
-  "name": "temp-ai-builder",
-  "version": "1.0.0",
-  "main": "Builder/runner.js",
-  "dependencies": {
-    "node-fetch": "^2.6.7"
-  }
-}
