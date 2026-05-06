@@ -1,5 +1,6 @@
 #!/bin/sh
-echo "🚀 SAFE PUSH START"
+
+echo "🚀 SAFE PUSH"
 
 git add .
 
@@ -8,10 +9,10 @@ if git diff --cached --quiet; then
   exit 0
 fi
 
-git commit -m "🧠 REPO NORMALIZATION: TEMP BUILDER ISOLATED + ROOT CLEAN"
+git commit -m "🧠 CLEAN CONSOLIDATION: SINGLE WORKFLOW + TEMP BUILDER ISOLATED"
 
 git pull --no-rebase origin main || true
 
 git push origin main || true
 
-echo "✅ PUSH COMPLETE"
+echo "✅ DONE"
