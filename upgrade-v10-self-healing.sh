@@ -1,3 +1,15 @@
+#!/bin/sh
+
+echo "🧠 INSTALLING V10 SELF-HEALING DEVOPS BRAIN..."
+
+mkdir -p "Temporary Builder/Builder/utils"
+mkdir -p "Temporary Builder/memory"
+mkdir -p "docs"
+
+# ----------------------------
+# V10 SELF-HEALING ENGINE
+# ----------------------------
+cat > "Temporary Builder/Builder/runner.js" << 'JS'
 const fs = require("fs");
 
 function read(p){
@@ -85,3 +97,41 @@ function run(){
 }
 
 run();
+JS
+
+# ----------------------------
+# MEMORY SYSTEM
+# ----------------------------
+echo "# ENTRY SPEC" > "Temporary Builder/memory/convo.md"
+echo "# FINAL SPEC" > "Temporary Builder/memory/convo2.md"
+echo "# V10 MEMORY NODE" > "Temporary Builder/memory/temp.md"
+
+# ----------------------------
+# SAFE PUSH SYSTEM
+# ----------------------------
+cat > push.sh << 'SH'
+#!/bin/sh
+
+echo "🚀 V10 SAFE PUSH"
+
+git add .
+
+if git diff --cached --quiet; then
+  echo "✅ NO CHANGES"
+  exit 0
+fi
+
+git commit -m "🧠 V10 SELF-HEALING DEVOPS BRAIN"
+
+git pull --no-rebase origin main || true
+
+git push origin main || true
+
+echo "✅ PUSH COMPLETE"
+SH
+
+chmod +x push.sh
+
+echo "✅ V10 INSTALLED"
+echo "👉 RUN: node Temporary Builder/Builder/runner.js"
+echo "👉 PUSH: sh push.sh"
