@@ -1,49 +1,27 @@
-const DAG = require("./dag");
-const { generate } = require("./llm");
-const { writeFile } = require("./writer");
-const fs = require("fs");
+const DAG = require("./core/dag");
+const { loadState } = require("./core/state");
+const { safeWrite } = require("./core/writer");
 
-function read(file) {
-  return fs.existsSync(file) ? fs.readFileSync(file, "utf8") : "";
-}
+const planner = require("./agents/planner");
+const builder = require("./agents/builder");
+const reviewer = require("./agents/reviewer");
+const repair = require("./agents/repair");
 
 (async () => {
-  console.log("🚀 DAG AI START");
+  console.log("🚀 PRODUCTION DAG BRAIN START");
 
-  const convo = read("Temporary Builder/memory/convo.md");
-  const convo2 = read("Temporary Builder/memory/convo2.md");
-
+  const state = loadState();
   const dag = new DAG();
 
-  dag.add("plan", async () => {
-    return await generate("PLAN PROJECT:\n" + convo);
-  });
-
-  dag.add("build", async () => {
-    return await generate("BUILD SYSTEM:\n" + convo + "\n" + convo2);
-  }, ["plan"]);
-
-  dag.add("write", async () => {
-    const raw = await generate("OUTPUT JSON FILES ONLY:\n" + convo);
-
-    let files = [];
-
-    try {
-      files = JSON.parse(raw);
-    } catch {
-      files = [
-        { path: "output/app.js", content: "console.log('AI fallback');" }
-      ];
-    }
-
-    for (const f of files) {
-      writeFile(f.path, f.content);
-    }
-
-    return files;
-  }, ["build"]);
+  dag.add("plan", async () => planner(state));
+  dag.add("build", async () => builder(state), ["plan"]);
+  dag.add("review", async () => reviewer(state), ["build"]);
+  dag.add("repair", async () => repair(state), ["review"]);
 
   await dag.run();
+
+  // FINAL OUTPUT ONLY GOES TO ROOT
+  safeWrite("app.generated.js", state.fixed || state.review || state.build);
 
   console.log("✅ DAG COMPLETE");
 })();

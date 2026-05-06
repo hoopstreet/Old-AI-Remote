@@ -1,0 +1,13 @@
+{
+  "rules": {
+    "single_source_memory": true,
+    "memory_input_only": [
+      "Temporary Builder/memory/convo.md",
+      "Temporary Builder/memory/convo2.md"
+    ],
+    "output_root_only": true,
+    "no_builder_output_to_root": true,
+    "dag_execution": "planner -> builder -> reviewer -> repair",
+    "conflict_policy": "ignore_duplicates_safe_merge"
+  }
+}

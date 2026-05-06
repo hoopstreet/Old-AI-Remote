@@ -1,19 +1,6 @@
-module.exports = async function repair(state) {
-  console.log("🧠 REPAIR START");
+const { generate } = require("../core/llm");
 
-  const review = state.context.review;
-
-  if (review.valid) {
-    console.log("🧠 NO REPAIR NEEDED");
-    return state;
-  }
-
-  console.log("⚠️ REPAIRING FILES");
-
-  state.context.files = state.context.files.map(f => ({
-    path: f.path,
-    content: f.content || "// repaired fallback"
-  }));
-
+module.exports = async (state) => {
+  state.fixed = await generate("FIX ERRORS IF ANY:\n" + state.review);
   return state;
 };

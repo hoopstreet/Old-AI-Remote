@@ -1,10 +1,11 @@
-name: TEMP AI BUILDER
+name: TEMP AI DAG BUILDER
 
 on:
   push:
     paths:
-      - "Temporary Builder/memory/convo.md"
-      - "Temporary Builder/memory/convo2.md"
+      - 'Temporary Builder/memory/convo.md'
+      - 'Temporary Builder/memory/convo2.md'
+  workflow_dispatch:
 
 jobs:
   build:
@@ -17,18 +18,20 @@ jobs:
         with:
           node-version: 18
 
-      - name: install
-        run: npm install
+      - name: Run DAG Brain
+        run: |
+          cd "Temporary Builder"
+          npm install || true
+          node Builder/runner.js
 
-      - name: run builder
-        run: node "Temporary Builder/Builder/runner.js"
-        env:
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-
-      - name: commit
+      - name: Commit Output
         run: |
           git config user.name "AI-BOT"
           git config user.email "bot@ai.dev"
+
           git add .
-          git commit -m "🧠 DAG AUTO BUILD" || echo "no changes"
-          git push
+
+          git commit -m "🧠 AUTO DAG BUILD" || echo "no changes"
+
+          git pull --rebase origin main || true
+          git push origin main || true
