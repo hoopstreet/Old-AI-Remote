@@ -1,4 +1,4 @@
-name: TEMP AI DAG BUILDER
+name: TEMP AI DAG ENGINE
 
 on:
   push:
@@ -18,7 +18,7 @@ jobs:
         with:
           node-version: 18
 
-      - name: Run DAG Brain
+      - name: Run DAG Engine
         run: |
           cd "Temporary Builder"
           npm install || true
@@ -31,7 +31,7 @@ jobs:
 
           git add .
 
-          git commit -m "🧠 AUTO DAG BUILD" || echo "no changes"
+          git commit -m "🧠 AUTO DAG EXECUTION" || echo "no changes"
 
           git pull --rebase origin main || true
           git push origin main || true
