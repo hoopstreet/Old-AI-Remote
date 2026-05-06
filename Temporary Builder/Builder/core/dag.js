@@ -1,22 +1,23 @@
 class DAG {
   constructor() {
     this.nodes = {};
-    this.deps = {};
+    this.edges = {};
   }
 
   add(name, fn, deps = []) {
     this.nodes[name] = fn;
-    this.deps[name] = deps;
+    this.edges[name] = deps;
   }
 
   async run() {
-    const state = { context: {}, memory: "" };
+    const state = {};
+
     const executed = new Set();
 
     const runNode = async (name) => {
       if (executed.has(name)) return;
 
-      const deps = this.deps[name] || [];
+      const deps = this.edges[name] || [];
 
       for (const d of deps) {
         await runNode(d);
@@ -24,11 +25,10 @@ class DAG {
 
       const fn = this.nodes[name];
 
-      if (!fn) throw new Error("Missing node: " + name);
-
       const result = await fn(state);
 
-      if (result) {
+      // 🔥 CRITICAL FIX: MERGE STATE PROPERLY
+      if (result && typeof result === "object") {
         Object.assign(state, result);
       }
 

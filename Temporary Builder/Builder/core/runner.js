@@ -20,19 +20,23 @@ const fixer = require("../agents/fixer");
     const dag = new DAG();
 
     dag.add("planner", async () => planner(state));
-    dag.add("coder", async (s) => coder(s), ["planner"]);
+    dag.add("coder", async () => coder(state), ["planner"]);
     dag.add("reviewer", async (s) => reviewer(s), ["coder"]);
     dag.add("critic", async (s) => critic(s), ["reviewer"]);
     dag.add("fixer", async (s) => fixer(s), ["critic"]);
 
     const result = await dag.run();
 
-    if (!result?.context?.files?.length) {
-      console.log("❌ NO FILES GENERATED FROM AI");
+    console.log("📦 FINAL STATE:", JSON.stringify(result, null, 2));
+
+    const files = result?.context?.files;
+
+    if (!Array.isArray(files) || files.length === 0) {
+      console.log("❌ NO FILES GENERATED");
       return;
     }
 
-    writeFiles(result.memory, result.context.files);
+    writeFiles(result.memory, files);
 
     console.log("✅ ROOT GENERATED SUCCESSFULLY");
 
