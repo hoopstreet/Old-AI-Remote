@@ -1,0 +1,10 @@
+{
+  "analysis": {
+    "risk": 10,
+    "level": "LOW"
+  },
+  "decision": {
+    "allowCommit": true,
+    "action": "COMMIT_ALLOWED"
+  }
+}

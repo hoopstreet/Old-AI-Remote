@@ -1,3 +1,15 @@
+#!/bin/sh
+
+echo "🧠 INSTALLING V9 AUTONOMOUS DEVOPS INTELLIGENCE SYSTEM..."
+
+mkdir -p "Temporary Builder/Builder/utils"
+mkdir -p "Temporary Builder/memory"
+mkdir -p "docs"
+
+# ----------------------------
+# V9 INTELLIGENCE ENGINE
+# ----------------------------
+cat > "Temporary Builder/Builder/runner.js" << 'JS'
 const fs = require("fs");
 
 function read(p){
@@ -85,3 +97,41 @@ function run(){
 }
 
 run();
+JS
+
+# ----------------------------
+# MEMORY SYSTEM
+# ----------------------------
+echo "# ENTRY SPEC" > "Temporary Builder/memory/convo.md"
+echo "# FINAL SPEC" > "Temporary Builder/memory/convo2.md"
+echo "# V9 MEMORY NODE" > "Temporary Builder/memory/temp.md"
+
+# ----------------------------
+# PUSH SYSTEM
+# ----------------------------
+cat > push.sh << 'SH'
+#!/bin/sh
+
+echo "🚀 V9 SAFE PUSH"
+
+git add .
+
+if git diff --cached --quiet; then
+  echo "✅ NO CHANGES"
+  exit 0
+fi
+
+git commit -m "🧠 V9 AUTONOMOUS DEVOPS INTELLIGENCE"
+
+git pull --no-rebase origin main || true
+
+git push origin main || true
+
+echo "✅ PUSH COMPLETE"
+SH
+
+chmod +x push.sh
+
+echo "✅ V9 INSTALLED"
+echo "👉 RUN: node Temporary Builder/Builder/runner.js"
+echo "👉 PUSH: sh push.sh"
