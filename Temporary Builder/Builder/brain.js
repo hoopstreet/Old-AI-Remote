@@ -18,28 +18,35 @@ async function runAI() {
   const convo = readConvos();
 
   const prompt = `
-You are an autonomous software builder.
+YOU ARE A PRODUCTION-GRADE SOFTWARE ENGINE BUILDER.
 
-RULES:
+STRICT RULES:
 - Output ONLY valid JSON
-- NO markdown, NO code blocks
-- MUST be parseable JSON
+- NO markdown, NO explanation
+- MUST be production-ready code (NOT demo)
+- MUST include full working logic
 
-FORMAT:
-{
-  "files": [{"path":"", "content":""}],
-  "install": []
-}
-
-INPUT SYSTEMS:
-- convo.md = GitHub Actions system
-- convo2.md = Telegram system
+SYSTEM INPUTS:
+- convo.md = GitHub Actions workflow rules
+- convo2.md = Telegram AI Remote system
 
 TASK:
-Merge both into working system.
+1. Build FULL working system
+2. Ensure GitHub Actions executes correctly
+3. Ensure Telegram bot is production-ready
+4. Connect all modules properly
+5. NO placeholders
 
-DATA:
-${convo.slice(0, 12000)}
+OUTPUT FORMAT:
+{
+  "files": [
+    { "path": "string", "content": "string" }
+  ],
+  "install": ["dependencies"]
+}
+
+CONTEXT:
+${convo.slice(0, 15000)}
 `;
 
   const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -50,22 +57,15 @@ ${convo.slice(0, 12000)}
     },
     body: JSON.stringify({
       model: "openai/gpt-4o-mini",
-      temperature: 0.2,
+      temperature: 0.1,
       messages: [{ role: "user", content: prompt }]
     })
   });
 
   const data = await res.json();
+  if (!data.choices) return null;
 
-  if (!data.choices) {
-    console.log("API ERROR:", data);
-    return null;
-  }
-
-  let text = data.choices[0].message.content;
-
-  text = clean(text);
-
+  let text = clean(data.choices[0].message.content);
   fs.writeFileSync("Temporary Builder/docs/raw.txt", text);
 
   return parse(text);

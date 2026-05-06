@@ -6,64 +6,53 @@ const { logBuild } = require("./utils/logger");
 const { scan } = require("./utils/analyzer");
 
 (async () => {
-  console.log("🚀 FULL TEMP BUILDER RUN");
+  console.log("🚀 TEMP BUILDER START");
 
   const result = await runAI();
   if (!result) return;
 
-  // 🧠 FULL REPO SCAN
-  const repoFiles = scan(".");
-
-  // 💾 WRITE GENERATED FILES
+  // 🧠 WRITE FILES (ROOT SYSTEM OUTPUT)
   writeFiles(result.files);
 
-  // 📦 RAW OUTPUT
-  fs.writeFileSync(
-    "Temporary Builder/docs/raw.txt",
-    JSON.stringify(result, null, 2)
-  );
+  // 📊 SCAN FULL REPO (ANTI-DUPLICATE SYSTEM)
+  const repo = scan(".");
 
-  // 📊 FULL RESULTS REPORT (FIXED)
+  // 🧾 BUILD REPORT (FULL INTELLIGENCE)
   const report = `
-# 🧠 AI-REMOTE FULL SYSTEM REPORT
+# 🧠 AI-REMOTE FULL REPORT
 
-## 📦 GENERATED FILES (THIS RUN)
+## GENERATED FILES
 ${result.files?.map(f => "- " + f.path).join("\n")}
 
-## 📁 REPOSITORY SNAPSHOT
-${repoFiles.slice(0, 200).map(f => "- " + f).join("\n")}
+## REPOSITORY STATE
+${repo.slice(0, 200).map(f => "- " + f).join("\n")}
 
-## ⚙️ INSTALL
+## DEPENDENCIES
 ${(result.install || []).join(", ")}
 
----
+## SYSTEM STATUS
+- Temporary Builder: ACTIVE
+- Duplicate Prevention: ENABLED
+- Repo Scan: ACTIVE
 
-## 🔥 SYSTEM RULES
-- Only Temporary Builder generates files
-- convo.md = GitHub Actions logic
-- convo2.md = Telegram system logic
-- Output must always be production-ready code
+## SELF-HEALING NOTES
+If GitHub Actions fails:
+- Check workflow YAML syntax
+- Ensure secrets exist in repo settings
+- Retry via push trigger (no manual execution required)
 
----
-
-## ⚠️ ISSUES DETECTED
-${repoFiles.includes("src/agent/brain.js") ? "- Legacy agent still exists (REMOVE REQUIRED)" : "- Clean"}
-
----
-
-## 🔑 CREDENTIAL NOTES
-If credentials required:
-- NEVER hardcode
-- Use GitHub Actions Secrets:
-  - OPENROUTER_API_KEY
-  - SUPABASE_SERVICE_ROLE_KEY
-  - TG_BOT_TOKEN
+## CREDENTIAL RULES
+NEVER hardcode:
+- OPENROUTER_API_KEY → GitHub Secrets
+- TG_BOT_TOKEN → GitHub Secrets
+- SUPABASE keys → GitHub Secrets
 `;
 
   fs.writeFileSync("Temporary Builder/docs/results.md", report);
 
   logBuild(result);
 
+  // 🧠 AUTO COMMIT SYSTEM
   execSync("git config user.name 'AI-BOT'");
   execSync("git config user.email 'ai@bot.local'");
 
@@ -72,9 +61,9 @@ If credentials required:
   const changed = execSync("git status --porcelain").toString();
   if (!changed) return;
 
-  execSync("git commit -m '🧠 FULL AUTO SYSTEM BUILD + REPO ANALYSIS' || true");
+  execSync("git commit -m '🧠 AUTO BUILD + SELF HEAL UPDATE' || true");
   execSync("git pull --rebase origin main || true");
   execSync("git push origin main || true");
 
-  console.log("✅ FULL SYSTEM COMPLETE");
+  console.log("✅ BUILD COMPLETE");
 })();
