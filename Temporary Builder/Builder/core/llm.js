@@ -1,29 +1,22 @@
 const https = require("https");
 
-async function callOpenRouter(prompt) {
-
-  const body = JSON.stringify({
-    model: "openai/gpt-4o-mini",
-    messages: [
-      {
-        role: "system",
-        content: "You are a STRICT JSON generator. You MUST output ONLY valid JSON. No markdown. No explanation."
-      },
-      {
-        role: "user",
-        content: prompt
-      }
-    ],
-    temperature: 0.1
-  });
-
+function callOpenRouter(prompt) {
   return new Promise((resolve, reject) => {
+
+    const body = JSON.stringify({
+      model: "openai/gpt-4o-mini",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.2,
+      max_tokens: 4000,
+      stream: false
+    });
+
     const req = https.request({
       hostname: "openrouter.ai",
       path: "/api/v1/chat/completions",
       method: "POST",
       headers: {
-        "Authorization": "Bearer " + process.env.OPENROUTER_API_KEY,
+        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
         "Content-Type": "application/json",
         "Content-Length": Buffer.byteLength(body)
       }
@@ -35,10 +28,17 @@ async function callOpenRouter(prompt) {
       res.on("end", () => {
         try {
           const json = JSON.parse(data);
-          const output = json.choices?.[0]?.message?.content || "";
-          resolve(output.trim());
-        } catch (e) {
-          reject(new Error("OpenRouter response parse failed"));
+
+          const output = json?.choices?.[0]?.message?.content;
+
+          if (!output || output.length < 20) {
+            return reject(new Error("EMPTY_OR_TRUNCATED_RESPONSE"));
+          }
+
+          resolve(output);
+
+        } catch (err) {
+          reject(new Error("INVALID_JSON_FROM_OPENROUTER"));
         }
       });
     });

@@ -12,22 +12,26 @@ const fixer = require("../agents/fixer");
   console.log("🚀 MEMORY → ROOT GENERATION START");
 
   try {
-    const state = {
+    const initialState = {
       memory: loadMemory(),
       context: {}
     };
 
     const dag = new DAG();
 
-    dag.add("planner", async () => planner(state));
-    dag.add("coder", async () => coder(state), ["planner"]);
-    dag.add("reviewer", async (s) => reviewer(s), ["coder"]);
-    dag.add("critic", async (s) => critic(s), ["reviewer"]);
-    dag.add("fixer", async (s) => fixer(s), ["critic"]);
+    dag.add("planner", async (state) => {
+      if (!state) throw new Error("Planner received invalid state");
+      return planner(state);
+    });
 
-    const result = await dag.run();
+    dag.add("coder", async (state) => coder(state), ["planner"]);
+    dag.add("reviewer", async (state) => reviewer(state), ["coder"]);
+    dag.add("critic", async (state) => critic(state), ["reviewer"]);
+    dag.add("fixer", async (state) => fixer(state), ["critic"]);
 
-    console.log("📦 FINAL STATE:", JSON.stringify(result, null, 2));
+    const result = await dag.run(initialState);
+
+    console.log("📦 FINAL STATE:", JSON.stringify(result?.context, null, 2));
 
     const files = result?.context?.files;
 

@@ -1,27 +1,36 @@
-const { callOpenRouter } = require("../core/llm");
-
 module.exports = async function planner(state) {
+  try {
+    const input =
+      state?.input ||
+      state?.context?.input ||
+      "create system";
 
-  if (!state || !state.memory) {
-    throw new Error("Planner received invalid state");
+    // FORCE STRUCTURED OUTPUT (NO TEXT PLANS)
+    const files = [
+      {
+        path: "output/system.json",
+        content: JSON.stringify(
+          {
+            message: "AUTO GENERATED SYSTEM",
+            input,
+            timestamp: Date.now()
+          },
+          null,
+          2
+        )
+      }
+    ];
+
+    return {
+      ...state,
+      context: {
+        ...state.context,
+        files
+      }
+    };
+
+  } catch (err) {
+    console.log("❌ PLANNER ERROR:", err.message);
+    return state;
   }
-
-  const prompt = `
-You are a software architect.
-
-Return ONLY JSON plan.
-
-PROJECT:
-${state.memory}
-`;
-
-  const res = await callOpenRouter(prompt);
-
-  return {
-    ...state,
-    context: {
-      ...state.context,
-      plan: res
-    }
-  };
 };

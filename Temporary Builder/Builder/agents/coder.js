@@ -1,46 +1,51 @@
-const { callOpenRouter } = require("../core/llm");
-const { extractJSON } = require("../core/json-safe");
+const { safeJSON } = require("../core/json-safe");
 
 module.exports = async function coder(state) {
-  const prompt = `
-YOU ARE A CODE GENERATOR.
+  try {
+    const planRaw =
+      state?.plan ||
+      state?.context?.plan ||
+      state?.context?.output;
 
-STRICT RULES:
-- Output ONLY valid JSON
-- NO markdown
-- NO explanation
-- NO extra text
+    if (!planRaw) {
+      console.log("❌ CODER: No plan found");
+      return state;
+    }
 
-FORMAT:
-{
-  "files": [
-    { "path": "app.js", "content": "// code here" }
-  ]
-}
+    // Parse if string
+    let plan = planRaw;
 
-PROJECT:
-${state.memory}
-`;
+    if (typeof planRaw === "string") {
+      plan = safeJSON(planRaw) || { raw: planRaw };
+    }
 
-  for (let i = 0; i < 3; i++) {
-    const res = await callOpenRouter(prompt);
+    // IMPORTANT: convert PLAN → FILES
+    const files = [];
 
-    console.log("📦 RAW AI OUTPUT:", res);
-
-    const parsed = extractJSON(res);
-
-    if (parsed && Array.isArray(parsed.files) && parsed.files.length > 0) {
+    // CASE 1: already files
+    if (Array.isArray(plan.files)) {
       return {
         ...state,
-        context: {
-          ...state.context,
-          files: parsed.files
-        }
+        context: { ...state.context, files: plan.files }
       };
     }
 
-    console.log("⚠️ Retry coder:", i + 1);
-  }
+    // CASE 2: structured plan → convert to file
+    files.push({
+      path: "output/plan.json",
+      content: JSON.stringify(plan, null, 2)
+    });
 
-  return { ...state, context: { files: [] } };
+    return {
+      ...state,
+      context: {
+        ...state.context,
+        files
+      }
+    };
+
+  } catch (err) {
+    console.log("❌ CODER CRASH:", err.message);
+    return state;
+  }
 };

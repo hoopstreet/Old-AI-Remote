@@ -1,8 +1,8 @@
 const fs = require("fs");
 
-function writeFiles(files) {
+function writeFiles(memory, files) {
   if (!Array.isArray(files)) {
-    console.log("⚠️ No valid files array → skip writing");
+    console.log("❌ INVALID FILES INPUT");
     return;
   }
 
@@ -10,7 +10,11 @@ function writeFiles(files) {
     if (!f?.path || !f?.content) continue;
 
     console.log("🧠 CREATED:", f.path);
-    fs.writeFileSync(f.path, f.content);
+
+    const dir = f.path.split("/").slice(0, -1).join("/");
+    if (dir) fs.mkdirSync(dir, { recursive: true });
+
+    fs.writeFileSync(f.path, f.content, "utf8");
   }
 }
 
