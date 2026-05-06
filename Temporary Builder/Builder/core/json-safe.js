@@ -1,14 +1,8 @@
-function safeJSON(input) {
-  if (!input) return null;
-
+function safeJSON(text) {
   try {
-    return JSON.parse(input);
+    return JSON.parse(text);
   } catch (e) {
-    console.log("⚠️ RAW NON-JSON OUTPUT DETECTED, FIXING...");
-
-    // extract JSON block from messy LLM output
-    const match = input.match(/\[[\s\S]*\]|\{[\s\S]*\}/);
-
+    const match = text.match(/\[[\s\S]*\]/);
     if (match) {
       try {
         return JSON.parse(match[0]);
@@ -16,7 +10,6 @@ function safeJSON(input) {
         return null;
       }
     }
-
     return null;
   }
 }

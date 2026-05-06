@@ -1,15 +1,15 @@
 const fs = require("fs");
 
 function loadMemory() {
-  const convo = fs.readFileSync("Temporary Builder/memory/convo.md", "utf8");
-  const convo2 = fs.readFileSync("Temporary Builder/memory/convo2.md", "utf8");
+  const c1 = fs.readFileSync("Temporary Builder/memory/convo.md", "utf8");
+  const c2 = fs.readFileSync("Temporary Builder/memory/convo2.md", "utf8");
 
   return `
-=== PRIMARY SPEC (convo.md) ===
-${convo}
+=== CONVO.md (PRIMARY) ===
+${c1}
 
-=== FINAL SPEC (convo2.md) ===
-${convo2}
+=== CONVO2.md (FINAL SPEC) ===
+${c2}
 `;
 }
 

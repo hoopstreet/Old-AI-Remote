@@ -2,42 +2,33 @@ const { callOpenRouter } = require("../core/llm");
 const { safeJSON } = require("../core/json-safe");
 
 module.exports = async function coder(state) {
+
   const prompt = `
-You are a production software generator.
+You are a production code generator.
 
 RULES:
-- Generate REAL working code
-- Output ONLY JSON array
-- NO explanation
+- Output ONLY valid JSON array
 - NO markdown
+- NO explanation
 
 FORMAT:
 [
-  { "path": "app.js", "content": "..." },
-  { "path": "server.js", "content": "..." }
+  { "path": "app.js", "content": "console.log('app');" }
 ]
 
-PROJECT PLAN:
-${state.context.plan}
+PROJECT:
+${state.memory}
 `;
 
   const res = await callOpenRouter(prompt);
 
   const parsed = safeJSON(res);
 
-  if (!parsed) {
-    console.log("❌ INVALID CODE OUTPUT → RETURN EMPTY");
-    return {
-      ...state,
-      context: { files: [] }
-    };
-  }
-
   return {
     ...state,
     context: {
       ...state.context,
-      files: parsed
+      files: parsed || []
     }
   };
 };
