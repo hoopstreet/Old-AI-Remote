@@ -1,21 +1,17 @@
 # 👤 USER GUIDE — TEMPORARY BUILDER
 
-## 🚀 HOW TO USE
+## 🚀 HOW TO CONTROL SYSTEM
 
-### STEP 1 — Edit Instructions
-
-Modify:
+Edit:
 
 Temporary Builder/memory/convo.md  
 Temporary Builder/memory/convo2.md  
 
-These control what the AI builds.
+These define what the AI builds.
 
 ---
 
-### STEP 2 — Trigger Build
-
-Option A (Recommended):
+## ▶️ TRIGGER BUILD
 
 git add .
 git commit -m "update instructions"
@@ -25,25 +21,20 @@ git push
 
 ---
 
-Option B (Manual):
+## 🧠 WHAT SYSTEM DOES
 
-node "Temporary Builder/Builder/runner.js"
-
----
-
-## 🧠 WHAT HAPPENS
-
-1. AI reads convo files
+1. Reads instructions
 2. Generates real code
-3. Writes files into root repo
-4. Fixes broken workflows
+3. Writes into root repo
+4. Repairs workflows
 5. Commits updates
+6. Logs everything
 
 ---
 
-## 📂 WHERE OUTPUT GOES
+## 📂 OUTPUT LOCATION
 
-Generated files appear in:
+Generated files go to:
 
 ROOT REPOSITORY
 
@@ -53,66 +44,50 @@ NOT inside Temporary Builder
 
 ## 🔧 TROUBLESHOOTING
 
-### ❌ No output generated
+❌ No output:
 - Check convo.md content
-- Ensure valid instructions
 
-### ❌ AI fails
+❌ AI error:
 - Check OPENROUTER_API_KEY
-- Check API quota
 
-### ❌ Workflow fails
-- System auto-repairs on next run
+❌ Workflow failure:
+- System auto-fixes next run
 
 ---
 
 ## 🔐 REQUIRED SETUP
 
-GitHub → Settings → Secrets:
-
-ADD:
+GitHub Secrets:
 
 OPENROUTER_API_KEY
 
 ---
 
-## 🔁 AUTO REPAIR SYSTEM
-
-Builder automatically:
-- fixes workflows
-- retries builds
-- commits patches
-
----
-
 ## 📊 LOGS
-
-View:
 
 Temporary Builder/logs/build-history.json
 
 ---
 
+## ⚠️ IMPORTANT RULES
+
+DO NOT:
+- manually break workflows
+- delete builder files
+- mix builder with output files
+
+---
+
 ## 🧠 BEST PRACTICE
 
-- Keep convo.md clear and structured
-- Avoid duplicate instructions
-- Use specific build goals
+- Keep instructions clear
+- Avoid duplicates
+- Define exact build goals
 
 ---
 
-## ⚠️ WARNING
+## ✅ CONTROL POINT
 
-Do NOT:
-- manually edit generated files randomly
-- break workflow YAML structure
-
----
-
-## ✅ FINAL NOTE
-
-You control the system via:
+Everything is controlled via:
 
 convo.md + convo2.md
-
-Everything else is automated.
