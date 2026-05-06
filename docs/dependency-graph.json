@@ -1,0 +1,22 @@
+{
+  "nodes": [
+    "entry",
+    "final",
+    "debug",
+    "repair"
+  ],
+  "edges": [
+    [
+      "entry",
+      "final"
+    ],
+    [
+      "final",
+      "debug"
+    ],
+    [
+      "debug",
+      "repair"
+    ]
+  ]
+}
