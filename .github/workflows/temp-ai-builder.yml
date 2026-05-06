@@ -1,51 +1,22 @@
-name: 🧠 V7 CLOUD DEVOPS OS
+name: TEMP BUILDER ENGINE (SINGLE SOURCE OF TRUTH)
 
 on:
   push:
     paths:
-      - "Temporary Builder/memory/convo.md"
-      - "Temporary Builder/memory/convo2.md"
-  workflow_dispatch:
-
-permissions:
-  contents: write
-  pull-requests: write
+      - "convo.md"
+      - "convo2.md"
+      - "Temporary Builder/**"
 
 jobs:
-  cloud-brain:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      - name: Install Dependencies
-        run: npm install node-fetch
-
-      - name: Run Cloud Brain Engine
-        env:
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-        run: node "Temporary Builder/Builder/runner.js"
-
-      - name: AI PR Review Gate
-        run: echo "🧠 PR REVIEW MODE ACTIVE"
-
-      - name: Create Pull Request (SAFE DEPLOYMENT)
-        uses: peter-evans/create-pull-request@v6
-        with:
-          title: "🧠 V7 Cloud DevOps OS Update"
-          commit-message: "v7 autonomous cloud devops system"
-          branch: "ai/v7-cloud-os"
-          body: |
-            🧠 V7 SYSTEM
-            - DAG distributed execution
-            - repo-to-repo memory
-            - semantic diff engine
-            - PR-based deployment only
+      - name: Run Builder Engine
+        run: node "Temporary Builder/runner.js"
