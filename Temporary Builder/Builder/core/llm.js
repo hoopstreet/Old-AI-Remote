@@ -1,10 +1,20 @@
 const https = require("https");
 
 async function callOpenRouter(prompt) {
-  const data = JSON.stringify({
+
+  const body = JSON.stringify({
     model: "openai/gpt-4o-mini",
-    messages: [{ role: "user", content: prompt }],
-    temperature: 0.2
+    messages: [
+      {
+        role: "system",
+        content: "You are a STRICT JSON generator. You MUST output ONLY valid JSON. No markdown. No explanation."
+      },
+      {
+        role: "user",
+        content: prompt
+      }
+    ],
+    temperature: 0.1
   });
 
   return new Promise((resolve, reject) => {
@@ -15,26 +25,26 @@ async function callOpenRouter(prompt) {
       headers: {
         "Authorization": "Bearer " + process.env.OPENROUTER_API_KEY,
         "Content-Type": "application/json",
-        "Content-Length": data.length
+        "Content-Length": Buffer.byteLength(body)
       }
     }, (res) => {
-      let body = "";
+      let data = "";
 
-      res.on("data", chunk => body += chunk);
+      res.on("data", chunk => data += chunk);
 
       res.on("end", () => {
         try {
-          const json = JSON.parse(body);
-          const text = json.choices?.[0]?.message?.content || "";
-          resolve(text);
+          const json = JSON.parse(data);
+          const output = json.choices?.[0]?.message?.content || "";
+          resolve(output.trim());
         } catch (e) {
-          reject(new Error("Invalid OpenRouter response"));
+          reject(new Error("OpenRouter response parse failed"));
         }
       });
     });
 
     req.on("error", reject);
-    req.write(data);
+    req.write(body);
     req.end();
   });
 }

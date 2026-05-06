@@ -1,24 +1,17 @@
 const { callOpenRouter } = require("../core/llm");
 
 module.exports = async function planner(state) {
+
+  if (!state || !state.memory) {
+    throw new Error("Planner received invalid state");
+  }
+
   const prompt = `
-You are a senior software architect.
+You are a software architect.
 
-TASK:
-Analyze FULL project specification below and design REAL software structure.
+Return ONLY JSON plan.
 
-IMPORTANT:
-- This is NOT a summary
-- This is NOT explanation
-- This is a BUILD PLAN for real code generation
-
-OUTPUT FORMAT:
-- files (list)
-- features
-- dependencies
-- architecture
-
-PROJECT SPEC:
+PROJECT:
 ${state.memory}
 `;
 
@@ -27,6 +20,7 @@ ${state.memory}
   return {
     ...state,
     context: {
+      ...state.context,
       plan: res
     }
   };

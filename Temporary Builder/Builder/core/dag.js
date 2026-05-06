@@ -1,32 +1,45 @@
 class DAG {
   constructor() {
-    this.nodes = new Map();
+    this.nodes = {};
+    this.deps = {};
   }
 
   add(name, fn, deps = []) {
-    this.nodes.set(name, { fn, deps, done: false, result: null });
-  }
-
-  async runNode(name) {
-    const node = this.nodes.get(name);
-    if (!node) return;
-
-    for (const dep of node.deps) {
-      await this.runNode(dep);
-    }
-
-    if (!node.done) {
-      node.result = await node.fn();
-      node.done = true;
-    }
-
-    return node.result;
+    this.nodes[name] = fn;
+    this.deps[name] = deps;
   }
 
   async run() {
-    for (const key of this.nodes.keys()) {
-      await this.runNode(key);
+    const state = { context: {}, memory: "" };
+    const executed = new Set();
+
+    const runNode = async (name) => {
+      if (executed.has(name)) return;
+
+      const deps = this.deps[name] || [];
+
+      for (const d of deps) {
+        await runNode(d);
+      }
+
+      const fn = this.nodes[name];
+
+      if (!fn) throw new Error("Missing node: " + name);
+
+      const result = await fn(state);
+
+      if (result) {
+        Object.assign(state, result);
+      }
+
+      executed.add(name);
+    };
+
+    for (const name of Object.keys(this.nodes)) {
+      await runNode(name);
     }
+
+    return state;
   }
 }
 

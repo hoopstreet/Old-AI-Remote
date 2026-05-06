@@ -1,52 +1,43 @@
 const DAG = require("./dag");
-const planner = require("../agents/planner");
-const coder = require("../agents/coder");
-const reviewer = require("../agents/reviewer");
-const fixer = require("../agents/fixer");
-const critic = require("../agents/critic");
-
 const { loadMemory } = require("./memory");
 const { writeFiles } = require("./writer");
 
-process.on("unhandledRejection", (e) => {
-  console.log("⚠️ HANDLED REJECTION:", e.message);
-});
+const planner = require("../agents/planner");
+const coder = require("../agents/coder");
+const reviewer = require("../agents/reviewer");
+const critic = require("../agents/critic");
+const fixer = require("../agents/fixer");
 
 (async () => {
   console.log("🚀 MEMORY → ROOT GENERATION START");
 
-  let memory;
   try {
-    memory = loadMemory();
-  } catch (e) {
-    console.log("❌ NO MEMORY FOUND → STOP");
-    return;
-  }
 
-  let state = { memory, context: {} };
+    const baseState = {
+      memory: loadMemory(),
+      context: {}
+    };
 
-  const dag = new DAG();
+    const dag = new DAG();
 
-  dag.add("planner", async () => planner(state));
-  dag.add("coder", async () => coder(state), ["planner"]);
-  dag.add("reviewer", async () => reviewer(state), ["coder"]);
-  dag.add("critic", async () => critic(state), ["reviewer"]);
-  dag.add("fixer", async () => fixer(state), ["critic"]);
+    dag.add("planner", async () => planner(baseState));
+    dag.add("coder", async () => coder(baseState), ["planner"]);
+    dag.add("reviewer", async () => reviewer(baseState), ["coder"]);
+    dag.add("critic", async () => critic(baseState), ["reviewer"]);
+    dag.add("fixer", async () => fixer(baseState), ["critic"]);
 
-  try {
-    state = await dag.run();
+    const state = await dag.run();
 
-    const files = state?.context?.files;
-
-    if (!files) {
-      console.log("⚠️ NO FILE OUTPUT FROM AI → SKIP ROOT WRITE");
+    if (!state.context.files || state.context.files.length === 0) {
+      console.log("⚠️ NO FILE OUTPUT FROM AI");
       return;
     }
 
-    writeFiles(files);
+    writeFiles(state.memory, state.context.files);
 
-    console.log("✅ ROOT GENERATED FROM MEMORY ONLY");
-  } catch (e) {
-    console.log("❌ DAG FAILED:", e.message);
+    console.log("✅ ROOT GENERATED SUCCESSFULLY");
+
+  } catch (err) {
+    console.log("❌ DAG CRASH:", err.message);
   }
 })();

@@ -1,41 +1,45 @@
 const { callOpenRouter } = require("../core/llm");
-const { safeJSON } = require("../core/json-safe");
 
 module.exports = async function coder(state) {
+
+  if (!state?.memory) {
+    throw new Error("Coder received invalid state");
+  }
 
   const prompt = `
 YOU ARE A PRODUCTION CODE GENERATOR.
 
-RULES:
-- ONLY output VALID JSON
+STRICT RULES:
+- Output ONLY valid JSON
 - NO markdown
 - NO explanation
-- NO text outside JSON
-- MUST be a list of files
+- NO text before or after
+- MUST follow schema exactly
 
-FORMAT:
-[
-  {
-    "path": "app.js",
-    "content": "// working node app"
-  },
-  {
-    "path": "index.html",
-    "content": "<html></html>"
-  }
-]
+SCHEMA:
+{
+  "files": [
+    {
+      "path": "string",
+      "content": "string"
+    }
+  ]
+}
 
-PROJECT SPEC:
+PROJECT MEMORY:
 ${state.memory}
+
+PROJECT PLAN:
+${state.context?.plan || ""}
 `;
 
+  const res = await callOpenRouter(prompt);
+
   try {
-    const res = await callOpenRouter(prompt);
+    const parsed = JSON.parse(res);
 
-    const parsed = safeJSON(res);
-
-    if (!parsed || !Array.isArray(parsed)) {
-      console.log("❌ CODER FAILED: invalid JSON output");
+    if (!parsed.files || !Array.isArray(parsed.files)) {
+      console.log("❌ INVALID AI OUTPUT STRUCTURE");
       return { ...state, context: { files: [] } };
     }
 
@@ -43,12 +47,14 @@ ${state.memory}
       ...state,
       context: {
         ...state.context,
-        files: parsed
+        files: parsed.files
       }
     };
 
-  } catch (err) {
-    console.log("❌ CODER CRASH:", err.message);
+  } catch (e) {
+    console.log("❌ RAW AI OUTPUT (NOT JSON):");
+    console.log(res);
+
     return { ...state, context: { files: [] } };
   }
 };
