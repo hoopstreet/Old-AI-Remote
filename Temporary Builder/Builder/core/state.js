@@ -1,17 +1,12 @@
-const fs = require("fs");
-
-function read(file) {
-  return fs.existsSync(file) ? fs.readFileSync(file, "utf-8") : "";
+function validateState(state) {
+  if (!state) return false;
+  if (!state.memory) return false;
+  if (!state.context) state.context = {};
+  return true;
 }
 
-function loadState() {
-  return {
-    memory: {
-      convo: read("Temporary Builder/memory/convo.md"),
-      convo2: read("Temporary Builder/memory/convo2.md")
-    },
-    context: {}
-  };
+function safeState(state) {
+  return validateState(state) ? state : { memory: "", context: {} };
 }
 
-module.exports = { loadState };
+module.exports = { validateState, safeState };
