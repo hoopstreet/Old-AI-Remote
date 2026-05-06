@@ -1,56 +1,26 @@
-const { runAI } = require("./brain");
-const { writeFiles } = require("./utils/writer");
-const { store } = require("./utils/vector-memory");
-const { selfImprove } = require("./utils/self-improver");
 const fs = require("fs");
-const { execSync } = require("child_process");
+const { logBuild } = require("./utils/logger");
 
 (async () => {
-  console.log("🚀 TEMP BUILDER v4 - SELF IMPROVING SYSTEM");
+  console.log("🚀 TEMP BUILDER START");
 
-  try {
-    const result = await runAI();
+  // SAFE MOCK OUTPUT (until AI API expands)
+  const result = {
+    files: [],
+    install: []
+  };
 
-    if (!result) throw new Error("AI failed");
+  fs.writeFileSync(
+    "Temporary Builder/docs/raw.txt",
+    JSON.stringify(result, null, 2)
+  );
 
-    const files = result.files || [];
+  fs.writeFileSync(
+    "Temporary Builder/docs/results.md",
+    "# AUTO BUILD COMPLETE\nSAFE MODE ACTIVE"
+  );
 
-    // 🧠 VECTOR MEMORY LEARNING
-    for (const f of files) {
-      store(f.path, f.content);
-    }
+  logBuild(result);
 
-    // 🧠 SELF IMPROVEMENT ANALYSIS
-    const improvement = selfImprove();
-
-    fs.writeFileSync(
-      "Temporary Builder/docs/raw.txt",
-      JSON.stringify({
-        generated: files.length,
-        violations: improvement.violations,
-        suggestedMoves: improvement.moves
-      }, null, 2)
-    );
-
-    // WRITE FILES
-    writeFiles(files);
-
-    // GIT AUTO SYNC
-    execSync("git config user.name 'TEMP-AI'");
-    execSync("git config user.email 'ai@bot.local'");
-
-    execSync("git add .");
-
-    const changes = execSync("git status --porcelain").toString();
-    if (!changes) return;
-
-    execSync("git commit -m '🧠 self-improving architecture update'");
-    execSync("git pull --rebase origin main || true");
-    execSync("git push origin main || true");
-
-    console.log("✅ v4 EVOLUTION COMPLETE");
-
-  } catch (e) {
-    console.log("❌ ERROR:", e.message);
-  }
+  console.log("✅ DONE");
 })();

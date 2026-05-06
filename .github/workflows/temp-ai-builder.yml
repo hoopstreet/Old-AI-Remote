@@ -1,25 +1,23 @@
-name: TEMP AI BUILDER v2
+name: TEMP AI BUILDER SELF HEAL ENGINE
 
 on:
   push:
     paths:
-      - "Temporary Builder/memory/**"
-
-  schedule:
-    - cron: "*/10 * * * *"
-
+      - "Temporary Builder/memory/convo.md"
+      - "Temporary Builder/memory/convo2.md"
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: write
-      pull-requests: write
-
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -28,27 +26,19 @@ jobs:
       - name: Install
         run: |
           cd "Temporary Builder"
-          npm install
+          npm install || true
 
       - name: Run Builder
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-        run: node "Temporary Builder/Builder/runner.js"
-
-      - name: Auto PR Recovery
-        uses: peter-evans/create-pull-request@v6
-        with:
-          title: "🧠 Auto Repair PR"
-          branch: repair/${{ github.run_id }}
-
-  rollback:
-    runs-on: ubuntu-latest
-    if: failure()
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: rollback last commit
         run: |
-          git revert HEAD --no-edit || true
+          node "Temporary Builder/Builder/runner.js"
+
+      - name: Auto Commit Fixes
+        run: |
+          git config user.name "AI-BOT"
+          git config user.email "ai@bot.local"
+          git add .
+          git diff --staged --quiet || git commit -m "🧠 AUTO SELF-HEAL"
+          git pull --rebase origin main || true
           git push origin main || true
