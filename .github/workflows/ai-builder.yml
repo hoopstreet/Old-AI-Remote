@@ -1,4 +1,4 @@
-name: Temporary Builder
+name: Temporary Builder Core
 
 on:
   push:
@@ -20,12 +20,12 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install builder deps
+      - name: Install dependencies
         run: |
           cd "Temporary Builder"
           npm install
 
-      - name: Run builder
+      - name: Run Autonomous Builder
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
