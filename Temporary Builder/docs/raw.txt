@@ -46,11 +46,11 @@
     },
     {
       "path": ".github/workflows/versioning.yml",
-      "content": "name: Versioning\non: [push]\njobs:\n  version:\n    runs-on: ubuntu-latest\n    steps:\n      - name: Checkout\n        uses: actions/checkout@v2\n      - name: Read VERSION.md\n        run: echo 'Reading version...'"
+      "content": "name: Versioning\non: [push]\njobs:\n  version:\n    runs-on: ubuntu-latest\n    steps:\n      - name: Checkout\n        uses: actions/checkout@v2\n      - name: Version bump\n        run: echo 'Bumping version...'"
     },
     {
       "path": ".github/workflows/tagging.yml",
-      "content": "name: Tagging\non: [push]\njobs:\n  tag:\n    runs-on: ubuntu-latest\n    steps:\n      - name: Checkout\n        uses: actions/checkout@v2\n      - name: Create tag\n        run: echo 'Creating tag...'"
+      "content": "name: Tagging\non: [push]\njobs:\n  tag:\n    runs-on: ubuntu-latest\n    steps:\n      - name: Checkout\n        uses: actions/checkout@v2\n      - name: Tag\n        run: echo 'Tagging...'"
     },
     {
       "path": ".github/workflows/release-notes.yml",
@@ -62,11 +62,15 @@
     },
     {
       "path": ".github/workflows/docker-push.yml",
-      "content": "name: Docker Push\non: [push]\njobs:\n  push:\n    runs-on: ubuntu-latest\n    steps:\n      - name: Checkout\n        uses: actions/checkout@v2\n      - name: Push to DockerHub\n        run: echo 'Pushing to DockerHub...'"
+      "content": "name: Docker Push\non: [push]\njobs:\n  push:\n    runs-on: ubuntu-latest\n    steps:\n      - name: Checkout\n        uses: actions/checkout@v2\n      - name: Push Docker image\n        run: echo 'Pushing Docker image...'"
     },
     {
       "path": ".github/workflows/hf-sync.yml",
       "content": "name: Hugging Face Sync\non: [push]\njobs:\n  sync:\n    runs-on: ubuntu-latest\n    steps:\n      - name: Checkout\n        uses: actions/checkout@v2\n      - name: Sync to Hugging Face\n        run: echo 'Syncing to Hugging Face...'"
+    },
+    {
+      "path": "scripts/task-runner.sh",
+      "content": "#!/bin/sh\n# Task runner script\n\necho 'Running tasks...'"
     }
   ],
   "install": []

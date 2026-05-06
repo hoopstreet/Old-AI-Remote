@@ -6,5 +6,5 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Read VERSION.md
-        run: echo 'Reading version...'
+      - name: Version bump
+        run: echo 'Bumping version...'
