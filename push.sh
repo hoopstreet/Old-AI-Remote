@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo "🚀 V7 SAFE PUSH"
+echo "🚀 V8 SAFE PUSH"
 
 git add .
 
@@ -9,7 +9,7 @@ if git diff --cached --quiet; then
   exit 0
 fi
 
-git commit -m "🧠 V7 SWARM DEVOPS BUILD"
+git commit -m "🧠 V8 DEVOPS OS BUILD"
 
 git pull --no-rebase origin main || true
 

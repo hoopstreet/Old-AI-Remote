@@ -1,0 +1,27 @@
+[
+  {
+    "agent": "ENTRY_AGENT",
+    "output": "# ENTRY PROJECT\n",
+    "status": "ok"
+  },
+  {
+    "agent": "ANALYZE_AGENT",
+    "output": "analyzing specs",
+    "status": "ok"
+  },
+  {
+    "agent": "PLAN_AGENT",
+    "output": "planning architecture",
+    "status": "ok"
+  },
+  {
+    "agent": "BUILD_AGENT",
+    "output": "building output files",
+    "status": "ok"
+  },
+  {
+    "agent": "FINALIZE_AGENT",
+    "output": "# FINAL PROJECT\n",
+    "status": "ok"
+  }
+]
