@@ -1,4 +1,4 @@
-name: TEMPORARY BUILDER SWARM V8
+name: TEMPORARY BUILDER SWARM V8 STABLE
 
 on:
   push:
@@ -22,6 +22,9 @@ jobs:
         with:
           node-version: 18
 
+      - name: Install Dependencies
+        run: npm install axios fs-extra || true
+
       - name: Run Swarm Engine
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
@@ -29,7 +32,7 @@ jobs:
           echo "🔥 SWARM TRIGGERED"
           node Temporary\ Builder/company/runtime/watch.js || true
 
-      - name: Commit Memory Safely
+      - name: Commit Memory Updates (SAFE MODE)
         run: |
           git config user.name "ai-swarm"
           git config user.email "ai@swarm.local"
