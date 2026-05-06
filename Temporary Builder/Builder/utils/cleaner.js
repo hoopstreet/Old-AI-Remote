@@ -1,4 +1,10 @@
 function clean(text) {
-  return text.replace(/```/g, "").trim();
+  if (!text) return "";
+
+  return text
+    .replace(/```json/g, "")
+    .replace(/```/g, "")
+    .replace(/^\s+|\s+$/g, "");
 }
+
 module.exports = { clean };
