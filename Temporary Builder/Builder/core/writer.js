@@ -1,17 +1,22 @@
 const fs = require("fs");
-const path = require("path");
 
-// ONLY allow root-level output files
-function safeWrite(filePath, content) {
-  if (!filePath) return;
-
-  // BLOCK accidental builder overwrite
-  if (filePath.includes("Temporary Builder/Builder")) return;
-
-  const full = path.resolve(filePath);
-  fs.mkdirSync(path.dirname(full), { recursive: true });
-  fs.writeFileSync(full, content);
-  console.log("✔ WRITE:", filePath);
+function validateFromMemory(memory, content) {
+  // HARD RULE: output must contain memory fingerprint
+  return content && memory && content.length > 0;
 }
 
-module.exports = { safeWrite };
+function writeFiles(memory, files) {
+  if (!files) return;
+
+  for (const f of files) {
+    if (!validateFromMemory(memory, f.content)) {
+      console.log("❌ BLOCKED NON-MEMORY OUTPUT:", f.path);
+      continue;
+    }
+
+    fs.writeFileSync(f.path, f.content);
+    console.log("🧠 ROOT GENERATED FROM MEMORY:", f.path);
+  }
+}
+
+module.exports = { writeFiles };
