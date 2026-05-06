@@ -2,18 +2,35 @@ name: TEMPORARY BUILDER SWARM
 
 on:
   push:
+    branches:
+      - main
     paths:
       - "convo.md"
       - "convo2.md"
-      - "Temporary Builder/memory/**"
+      - "Temporary Builder/**"
 
 jobs:
   swarm:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run DAG Brain
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Run DAG Brain Engine
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
           echo "🧠 SWARM TRIGGERED"
-          node "Temporary Builder/Builder/runner.js" || true
+          node "Temporary Builder/company/runtime/watch.js" || true
+
+      - name: Safe Commit Output
+        run: |
+          git config user.name "ai-swarm"
+          git config user.email "ai@swarm.local"
+          git add Temporary\ Builder/company/memory || true
+          git commit -m "🧠 AUTO SWARM UPDATE" || true
+          git push || true
