@@ -1,38 +1,19 @@
-name: AUTONOMOUS DAG AI ENGINE
+name: TEMPORARY BUILDER SWARM
 
 on:
   push:
     paths:
-      - 'Temporary Builder/memory/**'
-  schedule:
-    - cron: "*/10 * * * *"   # continuous execution every 10 minutes
-  workflow_dispatch:
+      - "convo.md"
+      - "convo2.md"
+      - "Temporary Builder/memory/**"
 
 jobs:
-  run:
+  swarm:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Install & Run DAG Engine
+      - name: Run DAG Brain
         run: |
-          cd "Temporary Builder"
-          npm install || true
-          node Builder/runner.js
-
-      - name: Commit AI Output
-        run: |
-          git config user.name "AI-BOT"
-          git config user.email "bot@ai.dev"
-
-          git add .
-
-          git commit -m "🧠 AUTO DAG EXECUTION (CONTINUOUS)" || echo "no changes"
-
-          git pull --rebase origin main || true
-          git push origin main || true
+          echo "🧠 SWARM TRIGGERED"
+          node "Temporary Builder/Builder/runner.js" || true
