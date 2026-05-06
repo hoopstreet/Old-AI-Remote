@@ -1,10 +1,18 @@
 function parse(text) {
-  if (!text) throw new Error("Empty AI output");
-
   try {
     return JSON.parse(text);
-  } catch {
-    throw new Error("Invalid JSON");
+  } catch (e) {
+    console.log("❌ JSON PARSE FAILED");
+
+    try {
+      const fixed = text
+        .substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
+
+      return JSON.parse(fixed);
+    } catch {
+      console.log("❌ RECOVERY FAILED");
+      return null;
+    }
   }
 }
 

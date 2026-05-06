@@ -1,16 +1,15 @@
 const { runAI } = require("./brain");
 const { writeFiles } = require("./utils/writer");
 const { logBuild } = require("./utils/logger");
-const { analyzeLogs } = require("./utils/analyzer");
-const { detectBrokenWorkflows, autoFixWorkflow } = require("./utils/workflow-repair");
 const fs = require("fs");
 const { execSync } = require("child_process");
 
 function safeExec(cmd) {
   try {
-    execSync(cmd, { stdio: "inherit" });
+    return execSync(cmd, { stdio: "inherit" });
   } catch (e) {
-    console.log("⚠️ Failed:", cmd);
+    console.log("⚠️ FAIL:", cmd);
+    return null;
   }
 }
 
@@ -19,12 +18,12 @@ function safeExec(cmd) {
 
   const result = await runAI();
 
-  if (!result || !result.files) {
+  if (!result) {
     console.log("❌ AI FAILED");
     process.exit(1);
   }
 
-  // WRITE FILES TO ROOT
+  // WRITE FILES
   writeFiles(result.files);
 
   // SAVE RAW OUTPUT
@@ -38,13 +37,13 @@ function safeExec(cmd) {
 # 🧠 AI BUILD RESULTS
 
 ## 📦 Files Generated
-${result.files.map(f => "- " + f.path).join("\n")}
+${result.files?.map(f => "- " + f.path).join("\n")}
 
-## 📌 Dependencies
+## ⚙️ Dependencies
 ${(result.install || []).join(", ")}
 
-## ⚙️ Mode
-SELF-HEAL ENABLED
+## ✅ STATUS
+SELF-HEAL ACTIVE
 `;
 
   fs.writeFileSync("Temporary Builder/docs/results.md", summary);
@@ -52,43 +51,36 @@ SELF-HEAL ENABLED
   // LOG HISTORY
   logBuild(result);
 
-  // 🧠 ANALYZE SYSTEM
-  const report = analyzeLogs();
-  if (report) {
-    fs.writeFileSync(
-      "Temporary Builder/memory/repo-index.json",
-      JSON.stringify(report, null, 2)
-    );
-  }
-
-  // 🛠 WORKFLOW AUTO FIX
-  const broken = detectBrokenWorkflows();
-  if (broken.length) {
-    console.log("⚠️ Fixing workflows...");
-    broken.forEach(b => {
-      autoFixWorkflow(".github/workflows/" + b.file);
-    });
-  }
-
-  // GIT AUTO SYNC
-  safeExec("git config user.name 'AI-BOT'");
-  safeExec("git config user.email 'ai@bot.local'");
-  safeExec("git add .");
-
-  const changed = execSync("git status --porcelain").toString();
-
-  if (!changed) {
-    console.log("✅ No changes");
-    return;
-  }
-
+  // SAFE GIT FLOW (NO REBASE LOOP)
   try {
-    safeExec("git commit -m '🧠 AUTO SELF-HEAL BUILD'");
-    safeExec("git pull --rebase origin main || true");
-    safeExec("git push origin main || true");
+    safeExec("git config user.name 'AI-BOT'");
+    safeExec("git config user.email 'ai@bot.local'");
+
+    safeExec("git add .");
+
+    const changed = execSync("git status --porcelain").toString();
+
+    if (!changed) {
+      console.log("✅ NO CHANGES");
+      return;
+    }
+
+    safeExec("git commit -m '🧠 AUTO BUILD UPDATE'");
+
+    // SAFE SYNC STRATEGY (NO REBASE)
+    safeExec("git fetch origin");
+    safeExec("git merge origin/main --no-edit || true");
+
+    safeExec("git push origin main");
+
   } catch (e) {
-    console.log("⚠️ Git failed → rollback");
-    safeExec("git reset --hard HEAD~1");
+    console.log("⚠️ GIT FAILURE → RESET");
+
+    try {
+      safeExec("git reset --hard origin/main");
+    } catch {}
+
+    console.log("♻️ RECOVERED");
   }
 
   console.log("✅ COMPLETE");

@@ -5,8 +5,8 @@
 - bot.py
 - requirements.txt
 
-## 📌 Dependencies
+## ⚙️ Dependencies
 pip install -r requirements.txt
 
-## ⚙️ Mode
-SELF-HEAL ENABLED
+## ✅ STATUS
+SELF-HEAL ACTIVE

@@ -4,7 +4,8 @@ function clean(text) {
   return text
     .replace(/```json/g, "")
     .replace(/```/g, "")
-    .replace(/^\s+|\s+$/g, "");
+    .replace(/\n/g, " ")
+    .trim();
 }
 
 module.exports = { clean };
