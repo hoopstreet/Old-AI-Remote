@@ -5,10 +5,10 @@ function loadMemory() {
   const convo2 = fs.readFileSync("Temporary Builder/memory/convo2.md", "utf8");
 
   return `
-=== CONVO.md ===
+=== PRIMARY SPEC (convo.md) ===
 ${convo}
 
-=== CONVO2.md ===
+=== FINAL SPEC (convo2.md) ===
 ${convo2}
 `;
 }

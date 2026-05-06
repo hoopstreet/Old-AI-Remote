@@ -2,17 +2,23 @@ const { callOpenRouter } = require("../core/llm");
 
 module.exports = async function planner(state) {
   const prompt = `
-Return ONLY a short structured plan.
+You are a senior software architect.
 
-NO sentences.
-NO explanations.
+TASK:
+Analyze FULL project specification below and design REAL software structure.
 
-Format:
-- files
+IMPORTANT:
+- This is NOT a summary
+- This is NOT explanation
+- This is a BUILD PLAN for real code generation
+
+OUTPUT FORMAT:
+- files (list)
 - features
-- structure
+- dependencies
+- architecture
 
-Input:
+PROJECT SPEC:
 ${state.memory}
 `;
 
@@ -20,6 +26,8 @@ ${state.memory}
 
   return {
     ...state,
-    context: { plan: res }
+    context: {
+      plan: res
+    }
   };
 };

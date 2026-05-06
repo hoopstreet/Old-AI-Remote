@@ -3,17 +3,21 @@ const { safeJSON } = require("../core/json-safe");
 
 module.exports = async function coder(state) {
   const prompt = `
-You are Coder AI.
+You are a production software generator.
 
-IMPORTANT:
-Return ONLY valid JSON array:
+RULES:
+- Generate REAL working code
+- Output ONLY JSON array
+- NO explanation
+- NO markdown
+
+FORMAT:
 [
-  { "path": "file.js", "content": "code here" }
+  { "path": "app.js", "content": "..." },
+  { "path": "server.js", "content": "..." }
 ]
 
-NO explanation. NO markdown. ONLY JSON.
-
-Project:
+PROJECT PLAN:
 ${state.context.plan}
 `;
 
@@ -22,8 +26,7 @@ ${state.context.plan}
   const parsed = safeJSON(res);
 
   if (!parsed) {
-    console.log("❌ INVALID JSON FROM AI - RETRYING SAFE MODE");
-
+    console.log("❌ INVALID CODE OUTPUT → RETURN EMPTY");
     return {
       ...state,
       context: { files: [] }
@@ -32,6 +35,9 @@ ${state.context.plan}
 
   return {
     ...state,
-    context: { ...state.context, files: parsed }
+    context: {
+      ...state.context,
+      files: parsed
+    }
   };
 };
