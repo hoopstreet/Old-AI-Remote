@@ -1,0 +1,35 @@
+name: AUTOGPT DEVOPS SAAS ENGINE
+
+on:
+  push:
+    paths:
+      - "Temporary Builder/memory/convo.md"
+      - "Temporary Builder/memory/convo2.md"
+
+jobs:
+  brain:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install deps
+        run: npm install node-fetch
+
+      - name: Run DevOps Brain
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: node Temporary\ Builder/Builder/runner.js
+
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          title: "🧠 AutoGPT DevOps Build"
+          branch: autogpt/devops
+          commit-message: "auto devops build"

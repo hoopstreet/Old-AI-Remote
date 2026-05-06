@@ -1,11 +1,16 @@
-function shouldRollback(result) {
-  if (!result || !result.files) return true;
+function shouldRollback(dag, analysis) {
+  let riskScore = 0;
 
-  const risky = result.files.some(f =>
-    !f.path || !f.content || f.content.length < 3
-  );
+  for (const a of analysis) {
+    if (a.risk === "high") riskScore += 50;
+  }
 
-  return risky;
+  if (dag.total > 50) riskScore += 20;
+
+  return {
+    rollback: riskScore > 60,
+    score: riskScore
+  };
 }
 
 module.exports = { shouldRollback };

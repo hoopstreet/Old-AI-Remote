@@ -1,33 +1,24 @@
-class DAG {
-  constructor() {
-    this.nodes = new Map();
+function buildDAG(files) {
+  const graph = [];
+
+  for (const file of files || []) {
+    graph.push({
+      node: file.path,
+      dependsOn: inferDependencies(file.path)
+    });
   }
 
-  add(task, deps = []) {
-    this.nodes.set(task, deps);
-  }
-
-  // Topological sort
-  resolve() {
-    const visited = new Set();
-    const result = [];
-
-    const visit = (node) => {
-      if (visited.has(node)) return;
-      visited.add(node);
-
-      const deps = this.nodes.get(node) || [];
-      for (const d of deps) visit(d);
-
-      result.push(node);
-    };
-
-    for (const node of this.nodes.keys()) {
-      visit(node);
-    }
-
-    return [...new Set(result)];
-  }
+  return {
+    nodes: graph,
+    total: graph.length
+  };
 }
 
-module.exports = { DAG };
+function inferDependencies(path) {
+  if (path.includes("server")) return ["database", "config"];
+  if (path.includes("api")) return ["server"];
+  if (path.includes("ui")) return ["api"];
+  return [];
+}
+
+module.exports = { buildDAG };

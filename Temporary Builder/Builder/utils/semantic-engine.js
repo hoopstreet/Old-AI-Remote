@@ -1,26 +1,23 @@
-const fs = require("fs");
-
-function read(file) {
-  try {
-    return fs.readFileSync(file, "utf-8");
-  } catch {
-    return "";
-  }
+function analyzeCode(files) {
+  return files.map(f => ({
+    file: f.path,
+    type: detectType(f.path),
+    risk: detectRisk(f.content || "")
+  }));
 }
 
-// Converts text → structured intent graph
-function analyzeIntent() {
-  const entry = read("Temporary Builder/memory/convo.md");
-  const final = read("Temporary Builder/memory/convo2.md");
-
-  return {
-    services: ["api", "frontend", "worker"],
-    features: {
-      entry,
-      final
-    },
-    complexity: entry.length + final.length
-  };
+function detectType(path) {
+  if (path.includes("api")) return "backend";
+  if (path.includes("ui")) return "frontend";
+  if (path.includes("db")) return "database";
+  return "core";
 }
 
-module.exports = { analyzeIntent };
+function detectRisk(code) {
+  if (!code) return "low";
+  if (code.includes("eval")) return "high";
+  if (code.includes("exec")) return "high";
+  return "low";
+}
+
+module.exports = { analyzeCode };
