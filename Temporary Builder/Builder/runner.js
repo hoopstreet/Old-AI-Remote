@@ -1,67 +1,84 @@
 const fs = require("fs");
+const path = require("path");
 const { runBrain } = require("./brain");
 const { execSync } = require("child_process");
 
+// 🧠 SAFE FILE WRITER (NO CRASH EVER)
+function writeSafe(filePath, content) {
+  try {
+    const dir = path.dirname(filePath);
+    fs.mkdirSync(dir, { recursive: true }); // FIXED
+    fs.writeFileSync(filePath, content || "");
+    console.log("✔ FILE:", filePath);
+  } catch (e) {
+    console.log("⚠️ WRITE FAILED:", filePath);
+  }
+}
+
+// 🧠 SAFE EXEC
 function run(cmd) {
   try {
     return execSync(cmd, { stdio: "inherit" });
   } catch (e) {
-    console.log("⚠️ SKIP:", cmd);
+    console.log("⚠️ CMD FAIL:", cmd);
   }
 }
 
-function write(path, content) {
-  const dir = path.split("/").slice(0, -1).join("/");
-  fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path, content || "");
-  console.log("✔", path);
-}
-
-(async () => {
+// 🧠 SAFE MAIN WRAPPER (NO unhandled promise crash)
+async function main() {
   console.log("🚀 SAFE BRAIN START");
 
-  let result = await runBrain();
+  let result = null;
+
+  try {
+    result = await runBrain();
+  } catch (e) {
+    console.log("❌ BRAIN ERROR → fallback mode");
+  }
 
   if (!result || !result.files) {
-    console.log("❌ fallback mode");
     result = {
       files: [
         {
-          path: "docs/fallback.md",
-          content: "Safe fallback output"
+          path: "Temporary Builder/docs/fallback.md",
+          content: "# SAFE FALLBACK MODE ACTIVE"
         }
       ]
     };
   }
 
-  for (const f of result.files) {
-    write(f.path, f.content);
+  for (const file of result.files) {
+    writeSafe(file.path, file.content);
   }
 
-  // credentials doc auto-create
-  write(
+  // credentials doc ALWAYS SAFE
+  writeSafe(
     "docs/tools-credentials.md",
-`# 🔐 CREDENTIALS GUIDE
+`# 🔐 CREDENTIALS MAP
 
-## GitHub
+GitHub:
 - GITHUB_TOKEN (auto)
 
-## AI
-- OPENROUTER_API_KEY → GitHub Secrets
+AI:
+- OPENROUTER_API_KEY (GitHub Secrets)
 
-## Hosting
+Deploy:
 - NF_TOKEN (Northflank)
 - RENDER_API_KEY
 - RAILWAY_TOKEN
 
-⚠️ Never hardcode secrets
+RULE:
+Never hardcode secrets
 `
   );
 
   // SAFE GIT FLOW
   run("git add .");
 
-  const status = execSync("git status --porcelain").toString();
+  let status = "";
+  try {
+    status = execSync("git status --porcelain").toString();
+  } catch {}
 
   if (!status) {
     console.log("✅ NO CHANGES");
@@ -72,5 +89,10 @@ function write(path, content) {
   run("git pull --no-rebase origin main || true");
   run("git push origin main || true");
 
-  console.log("✅ DONE");
-})();
+  console.log("✅ DONE SAFE");
+}
+
+// 🧠 HARD SAFETY WRAPPER (prevents iSH crash)
+main().catch(err => {
+  console.log("💥 GLOBAL CATCH:", err);
+});

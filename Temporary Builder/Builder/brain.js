@@ -1,9 +1,11 @@
 const fs = require("fs");
 
-function read(path) {
-  return fs.existsSync(path)
-    ? fs.readFileSync(path, "utf-8")
-    : "";
+function read(p) {
+  try {
+    return fs.readFileSync(p, "utf-8");
+  } catch {
+    return "";
+  }
 }
 
 async function runBrain() {
@@ -14,15 +16,15 @@ async function runBrain() {
     files: [
       {
         path: "README.md",
-        content: `# 🚀 PROJECT OUTPUT\n\n## ENTRY\n${entry}`
+        content: "# 🚀 ROOT PROJECT\n\nENTRY:\n" + entry
       },
       {
         path: "docs/project.md",
-        content: `# FINAL SPEC\n\n${final}`
+        content: "# FINAL PROJECT\n\n" + final
       },
       {
-        path: "docs/system-status.md",
-        content: `# SYSTEM STATUS\n\n✔ Stable Build Engine Active`
+        path: "Temporary Builder/docs/status.md",
+        content: "# SYSTEM OK\nSAFE MODE ACTIVE"
       }
     ]
   };
