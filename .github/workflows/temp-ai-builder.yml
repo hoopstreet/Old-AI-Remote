@@ -1,4 +1,4 @@
-name: TEMP AI BUILDER AUTO ENGINE
+name: TEMP AI BUILDER - SELF HEAL SYSTEM
 
 on:
   push:
@@ -7,7 +7,9 @@ on:
       - "Temporary Builder/memory/convo2.md"
 
   schedule:
-    - cron: "*/10 * * * *"   # every 10 minutes auto-run
+    - cron: "*/15 * * * *"  # every 15 minutes
+
+  workflow_dispatch:
 
 jobs:
   builder:
@@ -15,11 +17,14 @@ jobs:
 
     permissions:
       contents: write
+      pull-requests: write
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 18
 
@@ -28,8 +33,54 @@ jobs:
           cd "Temporary Builder"
           npm install
 
-      - name: Run Autonomous Builder
+      - name: Install actionlint (workflow validator)
+        run: |
+          curl -sSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash | bash
+          sudo mv actionlint /usr/local/bin/
+
+      - name: Validate GitHub Actions (self-heal check)
+        run: |
+          actionlint .github/workflows/*.yml || echo "⚠️ workflow issues detected"
+
+      - name: Run Temporary Builder AI
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
           node "Temporary Builder/Builder/runner.js"
+
+      - name: Commit changes (auto-fix loop)
+        run: |
+          git config user.name "TEMP-AI-BOT"
+          git config user.email "ai@bot.local"
+
+          git add .
+          git diff --cached --quiet && exit 0
+
+          git commit -m "🤖 auto-build update"
+
+      - name: Push changes
+        run: |
+          git pull --rebase origin main || true
+          git push origin main || true
+
+      - name: Create Auto PR (if needed)
+        uses: peter-evans/create-pull-request@v6
+        with:
+          title: "🤖 Auto AI Repair PR"
+          commit-message: "auto repair system update"
+          branch: auto/repair-${{ github.run_id }}
+
+  rollback:
+    runs-on: ubuntu-latest
+    if: failure()
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Auto rollback bad commit
+        run: |
+          git config user.name "TEMP-AI-BOT"
+          git config user.email "ai@bot.local"
+
+          git revert HEAD --no-edit || true
+          git push origin main || true
