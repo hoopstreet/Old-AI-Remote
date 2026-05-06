@@ -5,33 +5,62 @@ const { repairWorkflows } = require("./utils/workflow-repair");
 const fs = require("fs");
 const { execSync } = require("child_process");
 
-(async () => {
-  console.log("🚀 TEMP BUILDER RUNNING");
+function safe(cmd) {
+  try { execSync(cmd, { stdio: "inherit" }); } catch {}
+}
 
+(async () => {
+  console.log("🚀 TEMP BUILDER START");
+
+  // 🧠 Repair workflows first
   repairWorkflows();
 
   const result = await runAI();
-  if (!result) return;
 
+  if (!result || !result.files) {
+    console.log("❌ No valid AI output");
+    return;
+  }
+
+  // 🧠 WRITE FILES TO ROOT ONLY
   writeFiles(result.files);
 
+  // 🧠 SAVE RAW OUTPUT
   fs.writeFileSync(
-    "Temporary Builder/docs/results.md",
+    "Temporary Builder/docs/raw.txt",
     JSON.stringify(result, null, 2)
   );
 
+  // 🧠 SUMMARY
+  const summary = `
+# 🧠 AI BUILD RESULTS
+
+## FILES:
+${result.files.map(f => "- " + f.path).join("\n")}
+
+## STATUS:
+SUCCESS
+`;
+
+  fs.writeFileSync("Temporary Builder/docs/results.md", summary);
+
   logBuild(result);
 
-  try {
-    execSync("git config user.name 'AI-BOT'");
-    execSync("git config user.email 'ai@bot.local'");
-    execSync("git add .");
+  // 🧠 GIT SAFE SYNC
+  safe("git config user.name 'AI-BOT'");
+  safe("git config user.email 'ai@bot.local'");
+  safe("git add .");
 
-    const changed = execSync("git status --porcelain").toString();
-    if (!changed) return;
+  const changed = execSync("git status --porcelain").toString();
 
-    execSync("git commit -m '🧠 AUTO BUILD'");
-    execSync("git pull --rebase origin main || true");
-    execSync("git push origin main || true");
-  } catch {}
+  if (!changed) {
+    console.log("✅ No changes");
+    return;
+  }
+
+  safe("git commit -m '🧠 AUTO BUILD CLEAN'");
+  safe("git pull --rebase origin main || true");
+  safe("git push origin main || true");
+
+  console.log("✅ BUILD COMPLETE");
 })();
