@@ -1,44 +1,41 @@
-name: TEMPORARY BUILDER SWARM V8 STABLE
+name: AI Remote Builder
 
 on:
   push:
-    branches:
-      - main
     paths:
-      - "convo.md"
-      - "convo2.md"
-      - "Temporary Builder/**"
+      - "Temporary Builder/memory/convo.md"
+      - "Temporary Builder/memory/convo2.md"
 
 jobs:
-  swarm:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repo
+      - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
-      - name: Install Dependencies
-        run: npm install axios fs-extra || true
+      - name: Install dependencies
+        run: |
+          npm install
 
-      - name: Run Swarm Engine
+      - name: Run AI Builder DAG
+        run: |
+          node "Temporary Builder/Builder/runner.js"
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+
+      - name: Commit generated output
         run: |
-          echo "🔥 SWARM TRIGGERED"
-          node Temporary\ Builder/company/runtime/watch.js || true
+          git config user.name "ai-builder-bot"
+          git config user.email "ai-builder@bot.com"
 
-      - name: Commit Memory Updates (SAFE MODE)
-        run: |
-          git config user.name "ai-swarm"
-          git config user.email "ai@swarm.local"
+          git add .
 
-          git add Temporary\ Builder/company/memory/convo.md || true
-          git add Temporary\ Builder/company/memory/convo2.md || true
+          git commit -m "🧠 AI AUTO BUILD FROM TEMP BUILDER" || echo "no changes"
 
-          git commit -m "🧠 AUTO MEMORY UPDATE" || true
-          git push || true
+          git push
