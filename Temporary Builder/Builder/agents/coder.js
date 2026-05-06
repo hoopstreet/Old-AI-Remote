@@ -2,18 +2,19 @@ const { callOpenRouter } = require("../core/llm");
 const { extractJSON } = require("../core/json-safe");
 
 module.exports = async function coder(state) {
-
   const prompt = `
-YOU MUST OUTPUT VALID JSON ONLY.
+YOU ARE A CODE GENERATOR.
 
-NO TEXT.
-NO MARKDOWN.
-NO EXPLANATION.
+STRICT RULES:
+- Output ONLY valid JSON
+- NO markdown
+- NO explanation
+- NO extra text
 
-SCHEMA:
+FORMAT:
 {
   "files": [
-    { "path": "app.js", "content": "// code" }
+    { "path": "app.js", "content": "// code here" }
   ]
 }
 
@@ -21,12 +22,14 @@ PROJECT:
 ${state.memory}
 `;
 
-  for (let attempt = 0; attempt < 3; attempt++) {
-
+  for (let i = 0; i < 3; i++) {
     const res = await callOpenRouter(prompt);
+
+    console.log("📦 RAW AI OUTPUT:", res);
+
     const parsed = extractJSON(res);
 
-    if (parsed?.files?.length > 0) {
+    if (parsed && Array.isArray(parsed.files) && parsed.files.length > 0) {
       return {
         ...state,
         context: {
@@ -36,7 +39,7 @@ ${state.memory}
       };
     }
 
-    console.log("⚠️ Retry coder attempt:", attempt + 1);
+    console.log("⚠️ Retry coder:", i + 1);
   }
 
   return { ...state, context: { files: [] } };

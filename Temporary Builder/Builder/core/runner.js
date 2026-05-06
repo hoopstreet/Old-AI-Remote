@@ -12,28 +12,27 @@ const fixer = require("../agents/fixer");
   console.log("🚀 MEMORY → ROOT GENERATION START");
 
   try {
-
-    const baseState = {
+    const state = {
       memory: loadMemory(),
       context: {}
     };
 
     const dag = new DAG();
 
-    dag.add("planner", async () => planner(baseState));
-    dag.add("coder", async () => coder(baseState), ["planner"]);
-    dag.add("reviewer", async () => reviewer(baseState), ["coder"]);
-    dag.add("critic", async () => critic(baseState), ["reviewer"]);
-    dag.add("fixer", async () => fixer(baseState), ["critic"]);
+    dag.add("planner", async () => planner(state));
+    dag.add("coder", async (s) => coder(s), ["planner"]);
+    dag.add("reviewer", async (s) => reviewer(s), ["coder"]);
+    dag.add("critic", async (s) => critic(s), ["reviewer"]);
+    dag.add("fixer", async (s) => fixer(s), ["critic"]);
 
-    const state = await dag.run();
+    const result = await dag.run();
 
-    if (!state.context.files || state.context.files.length === 0) {
-      console.log("⚠️ NO FILE OUTPUT FROM AI");
+    if (!result?.context?.files?.length) {
+      console.log("❌ NO FILES GENERATED FROM AI");
       return;
     }
 
-    writeFiles(state.memory, state.context.files);
+    writeFiles(result.memory, result.context.files);
 
     console.log("✅ ROOT GENERATED SUCCESSFULLY");
 
