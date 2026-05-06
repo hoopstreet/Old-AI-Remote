@@ -2,6 +2,7 @@ name: TEMP AI BUILDER (MASTER SYSTEM)
 
 on:
   push:
+    branches: [ main ]
     paths:
       - "Temporary Builder/**"
       - "convo.md"
@@ -12,7 +13,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -20,17 +22,7 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: npm install node-fetch || true
+        run: npm install node-fetch
 
       - name: Run Builder
-        env:
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: node "Temporary Builder/Builder/runner.js"
-
-      - name: Commit changes
-        run: |
-          git config user.name "ai-builder"
-          git config user.email "ai@bot.local"
-          git add .
-          git commit -m "🧠 TEMP BUILDER AUTO SYNC" || true
-          git push || true
