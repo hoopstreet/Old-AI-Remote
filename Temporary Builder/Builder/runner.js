@@ -1,12 +1,12 @@
 const { runAI } = require("./brain");
 const { writeFiles } = require("./utils/writer");
-const { autoRefactor } = require("./utils/refactor-engine");
 const { store } = require("./utils/vector-memory");
+const { selfImprove } = require("./utils/self-improver");
 const fs = require("fs");
 const { execSync } = require("child_process");
 
 (async () => {
-  console.log("🚀 TEMP BUILDER v3 (REFRACTOR + VECTOR MEMORY)");
+  console.log("🚀 TEMP BUILDER v4 - SELF IMPROVING SYSTEM");
 
   try {
     const result = await runAI();
@@ -15,29 +15,27 @@ const { execSync } = require("child_process");
 
     const files = result.files || [];
 
-    // 🧠 STORE INTO VECTOR MEMORY
+    // 🧠 VECTOR MEMORY LEARNING
     for (const f of files) {
       store(f.path, f.content);
     }
 
-    // 🧠 AUTO REFACTOR STEP
-    const refactored = autoRefactor(files);
+    // 🧠 SELF IMPROVEMENT ANALYSIS
+    const improvement = selfImprove();
 
-    // WRITE CLEANED FILES ONLY
-    writeFiles(refactored.cleanedFiles);
-
-    // LOG RAW
     fs.writeFileSync(
       "Temporary Builder/docs/raw.txt",
       JSON.stringify({
-        original: files.length,
-        cleaned: refactored.cleanedFiles.length,
-        duplicates: refactored.duplicates,
-        suggestions: refactored.suggestions
+        generated: files.length,
+        violations: improvement.violations,
+        suggestedMoves: improvement.moves
       }, null, 2)
     );
 
-    // GIT SYNC
+    // WRITE FILES
+    writeFiles(files);
+
+    // GIT AUTO SYNC
     execSync("git config user.name 'TEMP-AI'");
     execSync("git config user.email 'ai@bot.local'");
 
@@ -46,11 +44,12 @@ const { execSync } = require("child_process");
     const changes = execSync("git status --porcelain").toString();
     if (!changes) return;
 
-    execSync("git commit -m '🧠 refactor + vector memory update'");
+    execSync("git commit -m '🧠 self-improving architecture update'");
     execSync("git pull --rebase origin main || true");
     execSync("git push origin main || true");
 
-    console.log("✅ v3 COMPLETE");
+    console.log("✅ v4 EVOLUTION COMPLETE");
+
   } catch (e) {
     console.log("❌ ERROR:", e.message);
   }
