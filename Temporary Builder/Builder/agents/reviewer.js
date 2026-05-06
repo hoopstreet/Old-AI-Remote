@@ -1,9 +1,19 @@
+const { callOpenRouter } = require("../core/llm");
+
 module.exports = async function reviewer(state) {
-  console.log("🔍 REVIEWER AGENT");
+  const prompt = `
+You are Reviewer AI.
+Check this code:
 
-  if (!state.context.files || state.context.files.length === 0) {
-    state.context.needsFix = true;
-  }
+${JSON.stringify(state.context.files)}
 
-  return state;
+Return OK or FIX suggestions.
+`;
+
+  const res = await callOpenRouter(prompt);
+
+  return {
+    ...state,
+    context: { ...state.context, review: res }
+  };
 };

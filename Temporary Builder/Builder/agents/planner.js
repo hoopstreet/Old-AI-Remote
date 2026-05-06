@@ -1,10 +1,19 @@
+const { callOpenRouter } = require("../core/llm");
+
 module.exports = async function planner(state) {
-  console.log("🧠 PLANNER AGENT");
+  const prompt = `
+You are Planner AI.
+Analyze this project request:
 
-  state.context.plan = {
-    goal: "Generate structured project from convo memory",
-    steps: ["analyze", "build", "review", "fix"]
+${state.memory}
+
+Return JSON plan of files to generate.
+`;
+
+  const res = await callOpenRouter(prompt);
+
+  return {
+    ...state,
+    context: { plan: res }
   };
-
-  return state;
 };

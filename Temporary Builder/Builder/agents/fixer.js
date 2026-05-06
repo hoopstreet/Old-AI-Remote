@@ -1,11 +1,16 @@
-module.exports = async function fixer(state) {
-  console.log("🛠 FIXER AGENT");
+const { callOpenRouter } = require("../core/llm");
 
-  if (state.context.needsFix) {
-    state.context.files = [{
-      path: "app.js",
-      content: "console.log('auto-fixed output');"
-    }];
+module.exports = async function fixer(state) {
+  if (state.context.failed) {
+    const prompt = `
+Fix this broken output:
+
+${JSON.stringify(state.context.files)}
+`;
+
+    const res = await callOpenRouter(prompt);
+
+    state.context.files = JSON.parse(res);
   }
 
   return state;
