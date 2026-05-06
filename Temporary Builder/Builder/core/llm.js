@@ -1,41 +1,22 @@
-const https = require("https");
+const fetch = require("node-fetch");
 
 async function callOpenRouter(prompt) {
-  return new Promise((resolve, reject) => {
-    const data = JSON.stringify({
+  const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer " + process.env.OPENROUTER_API_KEY,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
       model: "openai/gpt-4o-mini",
-      messages: [{ role: "user", content: prompt }]
-    });
-
-    const options = {
-      hostname: "openrouter.ai",
-      path: "/api/v1/chat/completions",
-      method: "POST",
-      headers: {
-        "Authorization": "Bearer " + process.env.OPENROUTER_API_KEY,
-        "Content-Type": "application/json"
-      }
-    };
-
-    const req = https.request(options, (res) => {
-      let body = "";
-
-      res.on("data", (chunk) => body += chunk);
-
-      res.on("end", () => {
-        try {
-          const json = JSON.parse(body);
-          resolve(json.choices[0].message.content);
-        } catch (e) {
-          reject(e);
-        }
-      });
-    });
-
-    req.on("error", reject);
-    req.write(data);
-    req.end();
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.2
+    })
   });
+
+  const data = await res.json();
+
+  return data.choices?.[0]?.message?.content || "";
 }
 
 module.exports = { callOpenRouter };

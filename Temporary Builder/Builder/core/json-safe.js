@@ -1,9 +1,16 @@
 function safeJSON(text) {
   try {
-    if (!text) return null;
     return JSON.parse(text);
   } catch (e) {
-    console.log("⚠️ JSON PARSE FAILED:", e.message);
+    // extract JSON block only
+    const match = text.match(/\[[\s\S]*\]/);
+    if (match) {
+      try {
+        return JSON.parse(match[0]);
+      } catch (e2) {
+        return null;
+      }
+    }
     return null;
   }
 }
