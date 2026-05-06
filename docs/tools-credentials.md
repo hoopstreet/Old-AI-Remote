@@ -1,2 +1,2 @@
-# CREDENTIALS GUIDE
-- OPENROUTER_API_KEY required in GitHub Secrets
+# Credentials
+OPENROUTER_API_KEY required in GitHub Secrets
